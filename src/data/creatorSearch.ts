@@ -46,47 +46,58 @@ function hash(s: string): number {
   return Math.abs(h)
 }
 
+const POOL_SIZE = 100
+
+/** Datos deterministas por índice (0..POOL_SIZE-1) para que el mismo id tenga siempre los mismos datos. */
+function getCreatorDataByIndex(index: number): Omit<CreatorCard, 'id'> {
+  const i = index % POOL_SIZE
+  const first = FIRST_NAMES[i % FIRST_NAMES.length]
+  const last = LAST_NAMES[Math.floor(i / FIRST_NAMES.length) % LAST_NAMES.length]
+  const userName = `${first} ${last}`
+  const handle = `@${first.toLowerCase()}${(i * 17) % 1000}`
+  const videoCount = 50 + ((i * 31) % 950)
+  const followersK = 50 + ((i * 17) % 950)
+  const followers = followersK >= 1000 ? `${(followersK / 1000).toFixed(1)}M` : `${followersK}K`
+  const engagement = (8 + (i % 22) + (i % 10) / 10).toFixed(2) + '%'
+  const likesTenths = 10 + (i * 7) % 90
+  const likes = `${(likesTenths / 10).toFixed(1)}M`
+  const location = LOCATIONS[i % LOCATIONS.length]
+  return {
+    userName,
+    handle,
+    avatarUrl: dicebearAvatar(i * 13),
+    location,
+    videoCount,
+    followers,
+    engagement,
+    likes,
+  }
+}
+
 /**
  * Genera una lista de creadores según los filtros activos.
- * Entre 50 y 100 cards; distinto orden/avatar por filtros.
+ * IDs estables (creator-0..creator-99): al quitar un filtro la selección se mantiene para los que sigan en la lista.
+ * Entre 50 y 100 cards; qué índices aparecen depende del seed de los filtros.
  */
 export function getCreatorSearchResults(activeFilters: string[]): CreatorCard[] {
   if (activeFilters.length === 0) return []
   const key = activeFilters.slice().sort().join('|')
   const seed = hash(key)
   const count = 50 + (seed % 51) // 50–100 cards
-  const usedHandles = new Set<string>()
   const results: CreatorCard[] = []
+  const usedIndices = new Set<number>()
 
-  for (let i = 0; i < count; i++) {
-    const idx = (seed + i * 7) % (FIRST_NAMES.length * LAST_NAMES.length)
-    const first = FIRST_NAMES[idx % FIRST_NAMES.length]
-    const last = LAST_NAMES[Math.floor(idx / FIRST_NAMES.length) % LAST_NAMES.length]
-    const userName = `${first} ${last}`
-    let handle = `@${first.toLowerCase()}${(seed + i) % 1000}`
-    while (usedHandles.has(handle)) handle = `@${first.toLowerCase()}${(seed + i + 1) % 1000}`
-    usedHandles.add(handle)
-
-    const avatarSeed = seed + i * 13
-    const videoCount = 50 + ((avatarSeed * 31) % 950)
-    const followersK = 50 + ((avatarSeed * 17) % 950) // 50K–1000K
-    const followers = followersK >= 1000 ? `${(followersK / 1000).toFixed(1)}M` : `${followersK}K`
-    const engagement = (8 + (avatarSeed % 22) + (avatarSeed % 10) / 10).toFixed(2) + '%'
-    const likesTenths = 10 + (avatarSeed * 7) % 90 // 10–99 → 1.0M–9.9M
-    const likes = `${(likesTenths / 10).toFixed(1)}M`
-    const location = LOCATIONS[(seed + i) % LOCATIONS.length]
-
-    results.push({
-      id: `creator-${seed}-${i}`,
-      userName,
-      handle,
-      avatarUrl: dicebearAvatar(avatarSeed),
-      location,
-      videoCount,
-      followers,
-      engagement,
-      likes,
-    })
+  for (let k = 0; k < count; k++) {
+    const index = (seed + k * 7) % POOL_SIZE
+    let idx = index
+    let tries = 0
+    while (usedIndices.has(idx) && tries < POOL_SIZE) {
+      idx = (idx + 1) % POOL_SIZE
+      tries++
+    }
+    usedIndices.add(idx)
+    const data = getCreatorDataByIndex(idx)
+    results.push({ id: `creator-${idx}`, ...data })
   }
 
   return results

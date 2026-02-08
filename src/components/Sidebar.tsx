@@ -5,21 +5,19 @@ interface NavItem {
   label: string
   icon?: React.ReactNode
   active?: boolean
-  collapse?: boolean
-  expand?: boolean
   header?: boolean
 }
 
 export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false)
   const nav: NavItem[] = [
-    { label: 'Home', icon: <Home className="w-5 h-5 flex-shrink-0" />, active: false, collapse: true },
+    { label: 'Home', icon: <Home className="w-5 h-5 flex-shrink-0" />, active: false },
     { label: 'Reports', header: true },
     { label: 'All reports', icon: <FileText className="w-5 h-5 flex-shrink-0" /> },
     { label: 'Workflows', header: true },
     { label: 'Audience overlap', icon: <CircleDot className="w-5 h-5 flex-shrink-0" /> },
     { label: 'Creator discovery', icon: <Telescope className="w-5 h-5 flex-shrink-0" />, active: true },
-    { label: 'More apps', icon: <LayoutGrid className="w-5 h-5 flex-shrink-0" />, expand: true },
+    { label: 'More apps', icon: <LayoutGrid className="w-5 h-5 flex-shrink-0" /> },
   ]
 
   return (
@@ -55,16 +53,7 @@ export function Sidebar() {
             title={collapsed ? item.label : undefined}
           >
             {item.icon}
-            {!collapsed && (
-              <>
-                <span className="truncate flex-1">{item.label}</span>
-                {(item.collapse ?? item.expand) && (
-                  <span className="text-gray-400 flex-shrink-0">
-                    {item.collapse ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-                  </span>
-                )}
-              </>
-            )}
+            {!collapsed && <span className="truncate flex-1">{item.label}</span>}
           </a>
         )
       })}
