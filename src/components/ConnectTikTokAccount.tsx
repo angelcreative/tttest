@@ -14,7 +14,7 @@ export function ConnectTikTokAccount({ onBack, onContinue }: ConnectTikTokAccoun
     <div className="p-6 flex flex-1 min-w-0 justify-center">
       <div className="w-full max-w-md flex flex-col items-center text-center">
         <img
-          src="/connect-illustration.png"
+          src={`${import.meta.env.BASE_URL}connect-illustration.png`}
           alt=""
           className="w-full max-w-sm h-auto my-4"
         />

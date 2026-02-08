@@ -8,20 +8,23 @@ interface BreadcrumbsProps {
 
 /** Breadcrumb único del wizard: mismo en todas las pantallas, clicable para ir a pasos anteriores. */
 export function Breadcrumbs({ currentStep, onNavigate }: BreadcrumbsProps) {
-  const steps = getStepsUpTo(currentStep)
+  const isCreatorSearch = currentStep === 'creator-search'
+  const steps = isCreatorSearch
+    ? [{ id: 'creator-search' as WizardStep, label: 'Creators search' }]
+    : getStepsUpTo(currentStep)
 
   return (
     <nav className="flex items-center gap-2 text-sm text-gray-500 mb-4 flex-wrap" aria-label="Breadcrumb">
       <span className="flex items-center gap-2">
         <button
           type="button"
-          onClick={() => onNavigate('select-network')}
+          onClick={() => onNavigate(isCreatorSearch ? 'choose-tiktok-method' : 'select-network')}
           className="hover:text-gray-900 font-medium transition-colors"
         >
           Home
         </button>
       </span>
-      {steps.map((step, i) => (
+      {steps.map((step) => (
         <span key={step.id} className="flex items-center gap-2">
           <span aria-hidden className="text-gray-400">›</span>
           {step.id === currentStep ? (

@@ -6,6 +6,7 @@ import { NetworkSelect } from './components/NetworkSelect'
 import { ChooseTikTokMethod } from './components/ChooseTikTokMethod'
 import { ConnectTikTokAccount } from './components/ConnectTikTokAccount'
 import { BrandMentions } from './components/BrandMentions'
+import { CreatorSearch } from './components/CreatorSearch'
 import type { WizardStep } from './data/wizardSteps'
 import type { NetworkId } from './data/networks'
 import type { TikTokMethodId } from './components/ChooseTikTokMethod'
@@ -14,7 +15,9 @@ function App() {
   const [step, setStep] = useState<WizardStep>('select-network')
 
   const handleMethodNext = (methodId: TikTokMethodId) => {
-    if (methodId === 'brand-mentions') {
+    if (methodId === 'campaign') {
+      setStep('creator-search')
+    } else if (methodId === 'brand-mentions') {
       setStep('connect-tiktok')
     }
   }
@@ -45,6 +48,9 @@ function App() {
           )}
           {step === 'brand-mentions' && (
             <BrandMentions onBack={() => setStep('connect-tiktok')} />
+          )}
+          {step === 'creator-search' && (
+            <CreatorSearch onBack={() => setStep('choose-tiktok-method')} />
           )}
         </main>
       </div>

@@ -5,7 +5,7 @@ export function Header() {
     <header className="flex-shrink-0 flex items-center justify-between h-14 px-6 border-b border-gray-200 bg-white">
       <div className="flex items-center gap-2">
         <img
-          src="/audiense-lockup-signal-core.svg"
+          src={`${import.meta.env.BASE_URL}audiense-lockup-signal-core.svg`}
           alt="audiense"
           className="h-6 w-auto"
           style={{ aspectRatio: '559 / 94' }}

@@ -209,7 +209,7 @@ function RequestPermissionDialog({
                     We&apos;ve notified {post.userName}. You&apos;ll be alerted when they approve the link.
                   </p>
                   <img
-                    src="/request-sent-illustration.png"
+                    src={`${import.meta.env.BASE_URL}request-sent-illustration.png`}
                     alt=""
                     className="w-32 h-auto mt-4 object-contain"
                     aria-hidden
