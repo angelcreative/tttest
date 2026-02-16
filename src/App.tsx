@@ -1,62 +1,71 @@
 import { useState } from 'react'
-import { Header } from './components/Header'
-import { Sidebar } from './components/Sidebar'
-import { Breadcrumbs } from './components/Breadcrumbs'
-import { NetworkSelect } from './components/NetworkSelect'
-import { ChooseTikTokMethod } from './components/ChooseTikTokMethod'
-import { ConnectTikTokAccount } from './components/ConnectTikTokAccount'
-import { BrandMentions } from './components/BrandMentions'
+import { AppLayout } from './layout/AppLayout'
+import { CreatorDiscoveryHome } from './components/CreatorDiscoveryHome'
 import { CreatorSearch } from './components/CreatorSearch'
-import type { WizardStep } from './data/wizardSteps'
+import { BrandMentions } from './components/BrandMentions'
+import { ChooseTikTokMethod } from './components/ChooseTikTokMethod'
+import { NetworkSelect } from './components/NetworkSelect'
 import type { NetworkId } from './data/networks'
 import type { TikTokMethodId } from './components/ChooseTikTokMethod'
 
+type MainView = 'creator-discovery' | 'select-network' | 'choose-method' | 'creator-search' | 'brand-mentions'
+
+const BREADCRUMB_BY_VIEW: Record<MainView, { label: string; current?: boolean }[]> = {
+  'creator-discovery': [{ label: 'Home', current: true }],
+  'select-network': [{ label: 'Home' }, { label: 'Select your network', current: true }],
+  'choose-method': [
+    { label: 'Home' },
+    { label: 'Select your network' },
+    { label: 'Choose TikTok method', current: true },
+  ],
+  'creator-search': [
+    { label: 'Home' },
+    { label: 'Select your network' },
+    { label: 'Choose TikTok method' },
+    { label: 'Campaign collab', current: true },
+  ],
+  'brand-mentions': [
+    { label: 'Home' },
+    { label: 'Select your network' },
+    { label: 'Choose TikTok method' },
+    { label: 'Brand mentions', current: true },
+  ],
+}
+
 function App() {
-  const [step, setStep] = useState<WizardStep>('select-network')
+  const [view, setView] = useState<MainView>('creator-discovery')
 
   const handleMethodNext = (methodId: TikTokMethodId) => {
-    if (methodId === 'campaign') {
-      setStep('creator-search')
-    } else if (methodId === 'brand-mentions') {
-      setStep('connect-tiktok')
-    }
+    if (methodId === 'campaign') setView('creator-search')
+    else setView('brand-mentions')
   }
 
   return (
-    <div className="h-full w-full flex bg-gray-50 text-gray-900">
-      <Sidebar />
-      <div className="flex-1 flex flex-col min-w-0">
-        <Header />
-        <main className="flex-1 overflow-auto flex flex-col">
-          <div className="flex-shrink-0 px-6 pt-6 pb-4 bg-gray-50 border-b border-gray-100">
-            <Breadcrumbs currentStep={step} onNavigate={setStep} />
-          </div>
-          {step === 'select-network' && (
-            <NetworkSelect onNext={(_id: NetworkId) => setStep('choose-tiktok-method')} />
-          )}
-          {step === 'choose-tiktok-method' && (
-            <ChooseTikTokMethod
-              onBack={() => setStep('select-network')}
-              onNext={handleMethodNext}
-            />
-          )}
-          {step === 'connect-tiktok' && (
-            <ConnectTikTokAccount
-              onBack={() => setStep('choose-tiktok-method')}
-              onContinue={() => setStep('brand-mentions')}
-            />
-          )}
-          {step === 'brand-mentions' && (
-            <BrandMentions onBack={() => setStep('connect-tiktok')} />
-          )}
-          {step === 'creator-search' && (
-            <CreatorSearch onBack={() => setStep('choose-tiktok-method')} />
-          )}
-        </main>
-      </div>
-    </div>
+    <AppLayout breadcrumbItems={BREADCRUMB_BY_VIEW[view]}>
+      {view === 'creator-discovery' && (
+        <CreatorDiscoveryHome onFindCreators={() => setView('select-network')} />
+      )}
+      {view === 'select-network' && (
+        <NetworkSelect
+          onBack={() => setView('creator-discovery')}
+          onNext={(_selectedId: NetworkId) => setView('creator-discovery')}
+          onContinueToCreatorSearch={() => setView('choose-method')}
+        />
+      )}
+      {view === 'choose-method' && (
+        <ChooseTikTokMethod
+          onBack={() => setView('select-network')}
+          onNext={handleMethodNext}
+        />
+      )}
+      {view === 'creator-search' && (
+        <CreatorSearch onBack={() => setView('choose-method')} />
+      )}
+      {view === 'brand-mentions' && (
+        <BrandMentions onBack={() => setView('choose-method')} />
+      )}
+    </AppLayout>
   )
 }
 
 export default App
-export type { WizardStep }

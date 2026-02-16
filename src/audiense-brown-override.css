@@ -1,0 +1,85 @@
+/**
+ * Audiense theme override: all brand/primary colors → brown shades.
+ * Load after tokens/themes/_audiense.css so themed Audiense UI uses brown.
+ */
+html[data-theme="audiense"] {
+  /* Border */
+  --border-interactive: var(--color-brown-300);
+
+  /* Text */
+  --text-icon-secondary: var(--color-brown-600);
+  --text-icon-secondary-active: var(--color-brown-400);
+  --text-icon-secondary-hover: var(--color-brown-500);
+  --text-primary-active: var(--color-brown-700);
+  --text-secondary: var(--color-brown-600);
+
+  /* System */
+  --background-success: var(--color-brown-200);
+  --text-icon-success: var(--color-brown-600);
+  --text-success-on-color: var(--color-brown-700);
+
+  /* Button */
+  --button-primary: var(--color-brown-600);
+  --button-primary-hover: var(--color-brown-500);
+  --button-primary-active: var(--color-brown-700);
+  --button-secondary: var(--color-brown-100);
+  --button-secondary-hover: var(--color-brown-200);
+  --button-secondary-active: var(--color-brown-300);
+  --button-tertiary-hover: var(--color-brown-100);
+  --button-tertiary-active: var(--color-brown-200);
+  --text-button-color: var(--color-brown-600);
+  --text-button-hover-color: var(--color-brown-500);
+  --text-button-active-color: var(--color-brown-400);
+
+  /* Tab — pill style (anatomy: rounded-s, stroke-s, spacing-3xs/m) */
+  --tab-text: var(--color-brown-700);
+  --tab-text-selected: var(--color-brown-800);
+  --tab-selected-background: var(--color-brown-100);
+  --tab-border: var(--color-black-200);
+  --tab-border-hover: var(--color-brown-300);
+  --tab-border-selected: var(--color-brown-300);
+  --tab-disabled-text: var(--copy-disabled, var(--color-black-400));
+  --tab-disabled-border: var(--color-black-100);
+
+  /* Checkbox */
+  --checkbox-border-hover: var(--color-brown-500);
+  --checkbox-selected-border: var(--color-brown-600);
+  --checkbox-selected-background: var(--color-brown-600);
+  --checkbox-selected-background-hover: var(--color-brown-400);
+
+  /* Radio */
+  --radio-button-border-hover: var(--color-brown-600);
+  --radio-button-selected-border: var(--color-brown-600);
+  --radio-button-selected-border-hover: var(--color-brown-500);
+
+  /* Table — hover de filas con black-100 */
+  --table-actionable-row-hover: var(--color-black-100);
+  --table-row-hover-bg: var(--color-black-100);
+
+  /* Button Group */
+  --button-group-selected-icon-color: var(--color-brown-700);
+  --button-group-selected-background: var(--color-brown-100);
+  --button-group-selected-color: var(--color-brown-800);
+
+  /* Select */
+  --select-listbox-item-focused-background: var(--color-brown-100);
+  --select-listbox-item-pressed-background: var(--color-brown-200);
+  --select-listbox-item-selected-background: var(--color-brown-200);
+
+  /* Link */
+  --link-color: var(--color-brown-700);
+  --link-visited-color: var(--color-brown-900);
+  --link-icon-color: var(--color-brown-600);
+  --link-visited-icon-color: var(--color-brown-800);
+
+  /* Toggle */
+  --toggle-selected-background: var(--color-brown-600);
+  --toggle-selected-background-hover: var(--color-brown-500);
+
+  /* Text Input */
+  --input-stroke-hover: var(--color-brown-600);
+
+  /* Sidebar expandido: hover y selected con black-100 */
+  --sidebar-item-slot-bg-hover: var(--color-black-100);
+  --sidebar-item-slot-bg-selected: var(--color-black-100);
+}

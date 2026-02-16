@@ -1,4 +1,6 @@
 /** 100 posts para Brand mentions – thumbnails Unsplash (sports), avatares reales, vídeos reales MP4. */
+export type BrandMentionSource = 'mention' | 'hashtag'
+
 export interface BrandMentionPost {
   id: string
   userName: string
@@ -11,6 +13,8 @@ export interface BrandMentionPost {
   description: string
   likes: string
   comments: string
+  /** Tab Mentions = @adidas en descripción; Tab Hashtags = #adidas en descripción */
+  source: BrandMentionSource
 }
 
 const UNSPLASH = (id: string, w = 400) =>
@@ -86,7 +90,21 @@ const LAST_NAMES = [
   'Young', 'Hall', 'Allen', 'King', 'Wright', 'Scott', 'Green', 'Baker', 'Adams', 'Nelson',
   'Hill', 'Campbell', 'Mitchell', 'Roberts', 'Carter', 'Phillips', 'Evans', 'Turner', 'Torres', 'Parker',
 ]
-const DESCRIPTIONS = [
+/** Descripciones que contienen @adidas para tab @ Mentions */
+const DESCRIPTIONS_MENTIONS = [
+  'Series of lifting. New tutorial @adidas #gym',
+  'Cycling season. @adidas cycling gear is top. #@adidas #cycling',
+  'Gym day. @adidas training collection. #@adidas #gym #fitness',
+  'Morning run in the new @adidas. So light! #@adidas #running',
+  'Loving my new @adidas Ultraboosts for the morning run! #running',
+  'Skate park vibes. @adidas skateboarding line is underrated. #skateboarding',
+  'Jogging practice today. This kit breathes so well. Thanks @adidas! #fitness',
+  'Beach workout with the crew. @adidas never disappoints. #sports',
+  'New @adidas drop is fire. #sneakers',
+  'Training session. @adidas performance wear. #training',
+]
+/** Descripciones que contienen #adidas para tab # Hashtag Mentions */
+const DESCRIPTIONS_HASHTAGS = [
   'Loving my new Adidas Ultraboosts for the morning run! #adidas #running',
   'Skate park vibes. Adidas skateboarding line is underrated. #adidas #skateboarding',
   'Jogging practice today. This kit breathes so well. Thanks Adidas! #adidas #fitness',
@@ -147,6 +165,9 @@ export function generateBrandMentionPosts(
       ? pexelsVideos![videoIndex].thumbnailUrl
       : UNSPLASH(UNSPLASH_IDS[i % UNSPLASH_IDS.length])
 
+    const source: BrandMentionSource = i % 2 === 0 ? 'mention' : 'hashtag'
+    const descriptions = source === 'mention' ? DESCRIPTIONS_MENTIONS : DESCRIPTIONS_HASHTAGS
+
     posts.push({
       id: String(i + 1),
       userName,
@@ -156,9 +177,10 @@ export function generateBrandMentionPosts(
       thumbnailUrl,
       videoUrl,
       views: formatViews(),
-      description: DESCRIPTIONS[i % DESCRIPTIONS.length],
+      description: descriptions[i % descriptions.length],
       likes: formatLikes(),
       comments: String(randomInt(500) + 50),
+      source,
     })
   }
 

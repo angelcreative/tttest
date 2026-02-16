@@ -47,15 +47,18 @@ function pickThumbnail(video: PexelsVideo): string {
 
 /**
  * Busca vídeos en Pexels y devuelve arrays de { videoUrl, thumbnailUrl }.
+ * @param page - Página (1-based) para paginación.
  */
 export async function searchPexelsVideos(
   apiKey: string,
   query: string,
-  perPage: number = 20
+  perPage: number = 20,
+  page: number = 1
 ): Promise<{ videoUrl: string; thumbnailUrl: string }[]> {
   const url = new URL('https://api.pexels.com/videos/search')
   url.searchParams.set('query', query)
   url.searchParams.set('per_page', String(perPage))
+  url.searchParams.set('page', String(page))
 
   const res = await fetch(url.toString(), {
     headers: { Authorization: apiKey },

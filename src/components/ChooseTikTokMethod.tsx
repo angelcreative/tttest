@@ -1,7 +1,6 @@
 import { useState } from 'react'
-import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { ArrowLeft, ArrowRight, User } from 'lucide-react'
 import { MethodCard } from './MethodCard'
-import { PreviewPanel } from './PreviewPanel'
 
 export type TikTokMethodId = 'campaign' | 'brand-mentions'
 
@@ -13,26 +12,26 @@ interface ChooseTikTokMethodProps {
 const methods: { id: TikTokMethodId; title: string; description: string }[] = [
   {
     id: 'campaign',
-    title: 'Campaign',
+    title: 'Campaign Collab',
     description:
-      'Find creators for your campaign or create a new campaign or add them to an existing campaign',
+      'Find creators based on specified criteria to invite to new or existing campaigns.',
   },
   {
     id: 'brand-mentions',
     title: 'Brand mentions',
-    description: 'Find creators that mentioned your brand and send link requests',
+    description: 'Find creators who mentioned your brand and send link requests.',
   },
 ]
 
 export function ChooseTikTokMethod({ onBack, onNext }: ChooseTikTokMethodProps) {
-  const [selectedId, setSelectedId] = useState<TikTokMethodId>('brand-mentions')
+  const [selectedId, setSelectedId] = useState<TikTokMethodId>('campaign')
 
   const handleNext = () => onNext(selectedId)
 
   return (
-    <div className="p-6 flex gap-6 flex-1 min-w-0">
-      <div className="flex-1 max-w-3xl min-w-0">
-        <div className="flex items-center justify-between mb-6">
+    <div className="p-6 flex-1 min-w-0">
+      <div className="max-w-3xl mx-auto">
+        <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <button
               type="button"
@@ -47,12 +46,30 @@ export function ChooseTikTokMethod({ onBack, onNext }: ChooseTikTokMethodProps) 
           <button
             type="button"
             onClick={handleNext}
-            className="px-5 py-2.5 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg flex items-center gap-2 transition-colors"
+            className="titan-btn-primary px-5 py-2.5 rounded-lg inline-flex items-center justify-center gap-2"
           >
             Next
-            <ArrowRight className="w-4 h-4" />
+            <ArrowRight className="w-4 h-4" strokeWidth={1.5} />
           </button>
         </div>
+
+        {/* Connected Account — misma sección que Creator Search / Brand Mentions */}
+        <div
+          className="flex items-center gap-4 rounded-xl border px-4 py-3 mb-6"
+          style={{ background: 'var(--surface-1)', borderColor: 'var(--divider)' }}
+        >
+          <div
+            className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full"
+            style={{ background: 'var(--color-black-100)' }}
+          >
+            <User className="h-5 w-5" style={{ color: 'var(--copy-secondary)' }} strokeWidth={1.5} />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs font-medium" style={{ color: 'var(--copy-tertiary)' }}>Connected Account:</p>
+            <p className="truncate text-sm font-semibold" style={{ color: 'var(--copy-primary)' }}>@adidas</p>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {methods.map((method) => (
             <MethodCard
@@ -64,9 +81,6 @@ export function ChooseTikTokMethod({ onBack, onNext }: ChooseTikTokMethodProps) 
             />
           ))}
         </div>
-      </div>
-      <div className="w-72 flex-shrink-0 hidden lg:block">
-        <PreviewPanel />
       </div>
     </div>
   )

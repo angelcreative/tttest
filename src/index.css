@@ -2,20 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --color-primary-50: #fef5f3;
-  --color-primary-100: #fde8e4;
-  --color-primary-200: #fbd1c9;
-  --color-primary-300: #f7b2a3;
-  --color-primary-400: #f38b72;
-  --color-primary-500: #ef6647;
-  --color-primary-600: #f74f25;
-  --color-primary-700: #dc3d1a;
-  --color-primary-800: #b83318;
-  --color-primary-900: #932e19;
-}
-
-html, body, #root {
+/* Titan theme applied via data-theme on <html>; tokens loaded from CDN. */
+html,
+body,
+#root {
   height: 100%;
   margin: 0;
   overflow: hidden;
@@ -23,43 +13,536 @@ html, body, #root {
 }
 
 body {
-  background: #f9fafb;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
-
-/* Fallback: primary CTA color por si Tailwind no pinta */
-.btn-primary {
-  background-color: #f74f25 !important;
-}
-.btn-primary:hover {
-  background-color: #dc3d1a !important;
-}
-.bg-primary-600 {
-  background-color: #f74f25 !important;
-}
-.hover\:bg-primary-700:hover {
-  background-color: #dc3d1a !important;
-}
-.border-primary-600 {
-  border-color: #f74f25 !important;
-}
-.ring-primary-600\/20 {
-  --tw-ring-color: rgb(247 79 37 / 0.2) !important;
-}
-.focus\:ring-primary-500:focus {
-  --tw-ring-color: #ef6647 !important;
-}
-.bg-primary-200 {
-  background-color: #fbd1c9 !important;
-}
-.hover\:bg-primary-300:hover {
-  background-color: #f7b2a3 !important;
-}
-.text-primary-600 {
-  color: #f74f25 !important;
-}
-
-/* Prevent pull-to-refresh and overscroll on mobile */
-body {
+  font-family: var(--font-audiense, 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif);
+  background: var(--surface-page, #f9fafb);
+  color: var(--text-on-surface, #1f2937);
   overscroll-behavior: none;
+}
+
+/* Navbar — Titan slots */
+.titan-navbar {
+  background: var(--navbar-slot-bg);
+  padding-left: var(--navbar-slot-pad-x);
+  padding-right: var(--navbar-slot-pad-x);
+  padding-top: var(--navbar-slot-pad-y);
+  padding-bottom: var(--navbar-slot-pad-y);
+  min-height: 70px;
+  border-bottom: 1px solid var(--divider, rgba(0,0,0,0.08));
+}
+
+.titan-navbar-icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-icon-only, 9999px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--icon-slot-secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.titan-navbar-icon-btn:hover {
+  background: var(--navbar-item-slot-bg-hover);
+  color: var(--icon-slot-secondary-hover);
+}
+
+.titan-navbar-icon-btn:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
+/* Sidebar — Titan slots. Animación expandir/colapsar. */
+.titan-sidebar {
+  background: var(--sidebar-slot-bg);
+  padding: var(--sidebar-slot-pad);
+  width: var(--sidebar-width, 72px);
+  transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Colapsado: centrar todos los icon buttons (expandir/contraer + ítems) en la caja */
+.titan-sidebar:not([data-expanded="true"]) {
+  align-items: center;
+}
+
+/* Botón expandir/colapsar — mismo tamaño y centrado que los ítems cuando está colapsado */
+.titan-sidebar-icon-btn {
+  width: var(--button-icon-slot-size, 40px);
+  height: var(--button-icon-slot-size, 40px);
+  min-width: 40px;
+  max-width: 40px;
+  flex-shrink: 0;
+  border-radius: var(--button-icon-slot-radius, 9999px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--icon-slot-secondary);
+  background: var(--button-icon-slot-bg, transparent);
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.titan-sidebar-icon-btn:hover {
+  background: var(--button-icon-slot-bg-hover, var(--surface-slot-hover));
+  color: var(--icon-slot-secondary-hover);
+}
+
+.titan-sidebar-icon-btn:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
+.titan-sidebar-item {
+  width: 100%;
+  min-height: 40px;
+  height: 40px;
+  border-radius: var(--radius-control);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-s);
+  padding-left: var(--spacing-2xs);
+  padding-right: var(--spacing-2xs);
+  color: var(--icon-slot-secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  margin-bottom: var(--spacing-2xs);
+  font-size: var(--font-size-m);
+  font-weight: var(--font-weight-500);
+  text-align: left;
+  transition: width 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+    min-width 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+    max-width 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+    border-radius 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+    margin 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+    padding 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+    justify-content 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.titan-sidebar-item-label {
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 12rem;
+  opacity: 1;
+  transition: max-width 0.24s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease-out;
+}
+
+.titan-sidebar:not([data-expanded="true"]) .titan-sidebar-item-label {
+  max-width: 0;
+  opacity: 0;
+}
+
+.titan-sidebar-header {
+  overflow: hidden;
+  max-height: 2.5rem;
+  opacity: 1;
+  transition: max-height 0.24s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease-out;
+}
+
+.titan-sidebar:not([data-expanded="true"]) .titan-sidebar-header {
+  max-height: 0;
+  opacity: 0;
+  margin: 0;
+  padding: 0;
+  visibility: hidden;
+}
+
+/* Expandido: ítem con texto, alineado a la izquierda */
+.titan-sidebar[data-expanded="true"] .titan-sidebar-item {
+  justify-content: flex-start;
+  padding-left: var(--spacing-s);
+}
+
+/* Colapsado: todos los ítems = Titan icon button, centrados en su caja y alineados con el botón expandir/contraer */
+.titan-sidebar:not([data-expanded="true"]) .titan-sidebar-item {
+  width: var(--button-icon-slot-size, 40px);
+  min-width: 40px;
+  max-width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: var(--button-icon-slot-radius, 9999px);
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  background: var(--button-icon-slot-bg, transparent);
+  color: var(--icon-slot-secondary);
+}
+
+.titan-sidebar:not([data-expanded="true"]) .titan-sidebar-item .titan-sidebar-item-label {
+  position: absolute;
+  width: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.titan-sidebar:not([data-expanded="true"]) .titan-sidebar-item:hover {
+  background: var(--button-icon-slot-bg-hover, var(--surface-slot-hover));
+  color: var(--icon-slot-secondary-hover);
+}
+
+.titan-sidebar:not([data-expanded="true"]) .titan-sidebar-item:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
+/* Desplegado: ítems = menú (hover/activo con black-100) */
+.titan-sidebar[data-expanded="true"] .titan-sidebar-item:hover {
+  background: var(--sidebar-item-slot-bg-hover);
+  color: var(--icon-slot-secondary-hover);
+}
+
+.titan-sidebar-item:hover {
+  background: var(--sidebar-item-slot-bg-hover);
+  color: var(--icon-slot-secondary-hover);
+}
+
+.titan-sidebar-item[aria-current="page"],
+.titan-sidebar-item.is-active {
+  background: var(--sidebar-item-slot-bg-selected);
+  color: var(--copy-primary);
+}
+
+/* Sin borde/barra izquierda de color en sidebar (ni plegado ni desplegado, ni hover ni activo) */
+
+/* Table — Titan borderless */
+.titan-table-wrap {
+  background: var(--table-bg, var(--surface-0));
+  border-radius: var(--table-radius);
+  overflow: hidden;
+}
+
+.titan-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-m);
+  line-height: var(--font-leading-m);
+}
+
+.titan-table th {
+  text-align: left;
+  font-weight: var(--font-weight-600);
+  color: var(--copy-primary);
+  padding: var(--table-cell-pad-y) var(--table-cell-pad-x);
+  border-bottom: 1px solid var(--table-header-border-bottom);
+  background: var(--surface-0);
+}
+
+.titan-table td {
+  padding: var(--table-cell-pad-y) var(--table-cell-pad-x);
+  border-bottom: 1px solid var(--table-cell-border-bottom);
+  color: var(--copy-secondary);
+}
+
+.titan-table tbody tr:hover {
+  background: var(--table-row-hover-bg, var(--surface-hover));
+}
+
+/* Button primary */
+.titan-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--btn-gap, var(--spacing-3xs));
+  padding: var(--control-pad-y) var(--control-pad-x);
+  border-radius: var(--button-slot-radius, var(--radius-control));
+  font-family: inherit;
+  font-weight: var(--font-weight-500);
+  font-size: var(--font-size-m);
+  line-height: var(--font-leading-m);
+  background: var(--button-primary-slot-bg);
+  color: var(--button-primary-slot-label);
+  border: none;
+  cursor: pointer;
+}
+
+.titan-btn-primary:hover {
+  background: var(--button-primary-slot-bg-hover);
+}
+
+.titan-btn-primary:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
+.titan-btn-primary:disabled,
+.titan-btn-primary[data-disabled],
+.titan-btn-primary[aria-disabled="true"] {
+  background: var(--button-disabled);
+  color: var(--copy-disabled, var(--copy-tertiary));
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+/* Button secondary — Titan compliant */
+.titan-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--btn-gap, var(--spacing-3xs));
+  padding: var(--control-pad-y) var(--control-pad-x);
+  border-radius: var(--button-slot-radius, var(--radius-control));
+  font-family: inherit;
+  font-weight: var(--font-weight-500);
+  font-size: var(--font-size-m);
+  line-height: var(--font-leading-m);
+  background: var(--button-secondary, var(--color-steel-100));
+  color: var(--text-button-color, var(--copy-primary));
+  border: none;
+  cursor: pointer;
+}
+
+.titan-btn-secondary:hover {
+  background: var(--button-secondary-hover, var(--color-steel-200));
+}
+
+.titan-btn-secondary:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
+.titan-btn-secondary:disabled,
+.titan-btn-secondary[data-disabled],
+.titan-btn-secondary[aria-disabled="true"] {
+  background: var(--button-disabled);
+  color: var(--copy-disabled, var(--copy-tertiary));
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+/* Button tertiary — Titan compliant, sin borde */
+.titan-btn-tertiary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--btn-gap, var(--spacing-3xs));
+  padding: var(--control-pad-y) var(--control-pad-x);
+  border-radius: var(--button-slot-radius, var(--radius-control));
+  font-family: inherit;
+  font-weight: var(--font-weight-500);
+  font-size: var(--font-size-m);
+  line-height: var(--font-leading-m);
+  background: transparent;
+  color: var(--text-button-color, var(--copy-primary));
+  border: none;
+  cursor: pointer;
+}
+
+.titan-btn-tertiary:hover {
+  background: var(--button-tertiary-hover, var(--color-steel-100));
+}
+
+.titan-btn-tertiary:active {
+  background: var(--button-tertiary-active, var(--color-steel-200));
+}
+
+.titan-btn-tertiary:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
+.titan-btn-tertiary:disabled,
+.titan-btn-tertiary[data-disabled],
+.titan-btn-tertiary[aria-disabled="true"] {
+  color: var(--copy-disabled, var(--copy-tertiary));
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+/* Tabs — Titan anatomy: pill style, $rounded-s, $stroke-s, $spacing-3xs (vertical), $spacing-m (horizontal), $heading-xs-500-ct */
+.titan-tab-list {
+  display: flex;
+  gap: var(--spacing-s, 12px);
+  margin-bottom: var(--spacing-m, 16px);
+}
+
+.titan-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-3xs, 6px) var(--spacing-m, 16px);
+  font-size: var(--font-size-s, 0.875rem);
+  font-weight: var(--font-weight-500);
+  line-height: 1.25;
+  color: var(--tab-text, var(--copy-secondary));
+  background: var(--surface-0, #fff);
+  border: 1px solid var(--tab-border, var(--divider));
+  border-radius: 8px;
+  cursor: pointer;
+  outline: none;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.titan-tab:hover {
+  color: var(--tab-text, var(--copy-primary));
+  border-color: var(--tab-border-hover, var(--border-interactive));
+}
+
+.titan-tab[data-selected] {
+  color: var(--tab-text-selected, var(--copy-primary));
+  background: var(--tab-selected-background);
+  border-color: var(--tab-border-selected, var(--button-primary));
+}
+
+.titan-tab[data-disabled],
+.titan-tab[aria-disabled="true"] {
+  color: var(--tab-disabled-text, var(--copy-disabled));
+  background: var(--surface-0, #fff);
+  border-color: var(--tab-disabled-border, var(--divider));
+  cursor: not-allowed;
+}
+
+.titan-tab:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
+/* Destructive link (Delete) */
+.titan-link-destructive {
+  color: var(--menu-item-destructive-slot-color, var(--color-red-600));
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-4xs);
+}
+
+.titan-link-destructive:hover {
+  text-decoration: underline;
+}
+
+.titan-link-destructive:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
+/* Titan menu / popover — contenedor y ítems (directivas Titan, padding igual en los cuatro lados) */
+.titan-menu,
+.titan-popover {
+  background: var(--popover-background, var(--popover-slot-bg));
+  border-radius: var(--popover-radius, var(--popover-slot-radius));
+  box-shadow: var(--popover-shadow, var(--popover-slot-shadow));
+  border: 1px solid var(--divider);
+  padding: var(--pad-s, 12px);
+  min-width: 160px;
+}
+
+.titan-menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--menu-item-slot-gap, var(--spacing-3xs));
+  width: 100%;
+  min-height: var(--menu-item-slot-height, 40px);
+  padding: 0 var(--menu-item-slot-pad-x, 12px);
+  border: none;
+  border-radius: var(--menu-item-slot-radius, var(--radius-control));
+  font-size: var(--font-size-m);
+  font-weight: var(--font-weight-500);
+  color: var(--menu-item-slot-color, var(--copy-primary));
+  background: var(--menu-item-slot-bg, transparent);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.titan-menu-item:hover {
+  background: var(--menu-item-slot-bg-hover);
+}
+
+.titan-menu-item:active,
+.titan-menu-item[data-pressed] {
+  background: var(--menu-item-slot-bg-active);
+}
+
+.titan-menu-item:focus {
+  outline: none;
+}
+
+.titan-menu-item:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: -2px;
+}
+
+/* Titan pill / chip (keyword tags, filtros removibles) */
+.titan-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--chip-gap, var(--pill-slot-gap, 4px));
+  height: var(--chip-height, var(--pill-slot-height, 28px));
+  padding: 0 var(--chip-pad-x, var(--pill-slot-pad-x, 12px));
+  border-radius: var(--chip-radius, var(--pill-slot-radius));
+  font-size: var(--font-size-m);
+  font-weight: var(--font-weight-500);
+  background: var(--pill-background, var(--chip-bg));
+  color: var(--pill-color, var(--chip-color));
+  border: none;
+}
+
+.titan-pill .titan-pill-remove {
+  padding: 2px;
+  border-radius: var(--tag-remove-radius, 9999px);
+  color: var(--tag-remove-icon, var(--copy-tertiary));
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.titan-pill .titan-pill-remove:hover {
+  background: var(--tag-remove-bg-hover);
+}
+
+.titan-pill .titan-pill-remove:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 1px;
+}
+
+/* Titan radio (ARIA) — círculo + punto cuando seleccionado, colores del tema (brown en Audiense) */
+.titan-radio-group .titan-radio-indicator {
+  position: relative;
+  width: 18px;
+  height: 18px;
+}
+.titan-radio-group .titan-radio-ring {
+  display: block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--input-border);
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+.titan-radio-group .titan-radio[data-selected] .titan-radio-ring {
+  border-color: var(--radio-button-selected-border);
+}
+.titan-radio-group .titan-radio-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  margin-top: -4px;
+  margin-left: -4px;
+  border-radius: 50%;
+  background: var(--radio-button-selected-border);
+  box-sizing: border-box;
+}
+.titan-radio-group .titan-radio:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Select network: cards — fondo por defecto y hover black-100 */
+.network-card {
+  background: var(--surface-0);
+}
+.network-card:not(.network-card--selected):hover {
+  background: var(--color-black-100);
+}
+.network-card:not(.network-card--selected):active {
+  background: var(--color-black-200);
 }

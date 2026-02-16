@@ -1,60 +1,72 @@
-import { useState } from 'react'
-import { Home, FileText, CircleDot, Telescope, LayoutGrid, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Button } from 'react-aria-components'
+import { Home, FileText, Scale, Telescope, LayoutGrid, ChevronLeft, ChevronRight } from 'lucide-react'
 
-interface NavItem {
-  label: string
-  icon?: React.ReactNode
-  active?: boolean
-  header?: boolean
+type SidebarItemId = 'home' | 'all-reports' | 'audience-overlap' | 'creator-discovery' | 'more'
+
+const SIDEBAR_STRUCTURE: Array<
+  | { type: 'header'; label: string }
+  | { type: 'item'; id: SidebarItemId; label: string; icon: typeof Home }
+> = [
+  { type: 'item', id: 'home', label: 'Home', icon: Home },
+  { type: 'header', label: 'REPORTS' },
+  { type: 'item', id: 'all-reports', label: 'All reports', icon: FileText },
+  { type: 'header', label: 'WORKFLOWS' },
+  { type: 'item', id: 'audience-overlap', label: 'Audience overlap', icon: Scale },
+  { type: 'item', id: 'creator-discovery', label: 'Creator discovery', icon: Telescope },
+  { type: 'item', id: 'more', label: 'More apps', icon: LayoutGrid },
+]
+
+interface SidebarProps {
+  collapsed?: boolean
+  onToggle?: () => void
 }
 
-export function Sidebar() {
-  const [collapsed, setCollapsed] = useState(false)
-  const nav: NavItem[] = [
-    { label: 'Home', icon: <Home className="w-5 h-5 flex-shrink-0" />, active: false },
-    { label: 'Reports', header: true },
-    { label: 'All reports', icon: <FileText className="w-5 h-5 flex-shrink-0" /> },
-    { label: 'Workflows', header: true },
-    { label: 'Audience overlap', icon: <CircleDot className="w-5 h-5 flex-shrink-0" /> },
-    { label: 'Creator discovery', icon: <Telescope className="w-5 h-5 flex-shrink-0" />, active: true },
-    { label: 'More apps', icon: <LayoutGrid className="w-5 h-5 flex-shrink-0" /> },
-  ]
+export function Sidebar({ collapsed = true, onToggle }: SidebarProps) {
+  const activeId: SidebarItemId = 'creator-discovery'
 
   return (
     <aside
-      className={`flex-shrink-0 bg-gray-100 border-r border-gray-200 flex flex-col py-4 transition-[width] duration-200 ${
-        collapsed ? 'w-[4.5rem]' : 'w-56'
-      }`}
+      className="titan-sidebar flex flex-col flex-shrink-0 border-r border-[var(--divider)]"
+      style={{ width: collapsed ? '72px' : '14rem' }}
+      data-expanded={!collapsed}
     >
-      <button
-        type="button"
-        onClick={() => setCollapsed((c) => !c)}
-        className="mx-2 mb-2 p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-200 flex items-center justify-center"
+      {/* Expand/collapse — encima de Home */}
+      <Button
+        onPress={onToggle}
+        className="titan-sidebar-icon-btn mb-2"
         aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
       >
-        {collapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
-      </button>
-      {nav.map((item) => {
-        if (item.header) {
-          if (collapsed) return null
+        {collapsed ? (
+          <ChevronRight className="w-5 h-5 shrink-0" strokeWidth={1.5} />
+        ) : (
+          <ChevronLeft className="w-5 h-5 shrink-0" strokeWidth={1.5} />
+        )}
+      </Button>
+
+      {SIDEBAR_STRUCTURE.map((row) => {
+        if (row.type === 'header') {
           return (
-            <div key={item.label} className="px-4 pt-4 pb-1 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-              {item.label}
+            <div
+              key={row.label}
+              className="titan-sidebar-header px-4 pt-4 pb-1 text-xs font-semibold uppercase tracking-wider"
+              style={{ color: 'var(--copy-tertiary)' }}
+            >
+              {row.label}
             </div>
           )
         }
+        const { id, label, icon: Icon } = row
+        const isActive = activeId === id
         return (
-          <a
-            key={item.label}
-            href="#"
-            className={`mx-2 px-3 py-2 rounded-lg flex items-center gap-3 text-sm font-medium transition-colors ${
-              item.active ? 'bg-gray-200 text-gray-900' : 'text-gray-700 hover:bg-gray-200/70'
-            } ${collapsed ? 'justify-center' : ''}`}
-            title={collapsed ? item.label : undefined}
+          <Button
+            key={id}
+            className={`titan-sidebar-item ${isActive ? 'is-active' : ''}`}
+            aria-label={label}
+            aria-current={isActive ? 'page' : undefined}
           >
-            {item.icon}
-            {!collapsed && <span className="truncate flex-1">{item.label}</span>}
-          </a>
+            <Icon className="w-5 h-5 shrink-0" strokeWidth={1.5} />
+            <span className="titan-sidebar-item-label truncate text-left flex-1">{label}</span>
+          </Button>
         )
       })}
     </aside>

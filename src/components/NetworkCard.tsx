@@ -1,3 +1,4 @@
+import { Button } from 'react-aria-components'
 import { Check } from 'lucide-react'
 import type { Network } from '../data/networks'
 import { TikTokLogo } from './TikTokLogo'
@@ -6,6 +7,12 @@ interface NetworkCardProps {
   network: Network
   selected: boolean
   onSelect: () => void
+  /** Si false, se muestra mensaje + CTA Connect; si true, pill "Authenticated" */
+  authenticated: boolean
+  /** Llamado al pulsar Connect (solo cuando !authenticated). Abre el flujo de autorización. */
+  onConnect?: () => void
+  /** Llamado al pulsar Revoke access (solo cuando authenticated). Desconecta la cuenta. */
+  onDisconnect?: () => void
 }
 
 function NetworkLogo({ id }: { id: string }) {
@@ -14,7 +21,7 @@ function NetworkLogo({ id }: { id: string }) {
   }
   if (id === 'x') {
     return (
-      <svg viewBox="0 0 24 24" className="w-10 h-10" fill="#000">
+      <svg viewBox="0 0 24 24" className="w-10 h-10" fill="currentColor" style={{ color: 'var(--copy-primary)' }}>
         <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
       </svg>
     )
@@ -43,32 +50,100 @@ function NetworkLogo({ id }: { id: string }) {
   return null
 }
 
-export function NetworkCard({ network, selected, onSelect }: NetworkCardProps) {
+export function NetworkCard({ network, selected, onSelect, authenticated, onConnect, onDisconnect }: NetworkCardProps) {
   return (
-    <button
-      type="button"
-      onClick={() => onSelect()}
-      className={`relative w-full text-left rounded-xl border-2 p-6 transition-colors cursor-pointer ${
-        selected
-          ? 'bg-emerald-50 border-primary-600 ring-2 ring-primary-600/20'
-          : 'bg-white border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-      }`}
+    <Button
+      onPress={onSelect}
+      className={`network-card relative w-full text-left rounded-xl border p-6 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring-color)] focus-visible:ring-offset-2 ${selected ? 'network-card--selected' : ''}`}
+      style={{
+        borderWidth: '1px',
+        borderColor: 'var(--border)',
+        ...(selected ? { background: 'var(--color-teal-100)' } : {}),
+        boxShadow: '0 1px 3px 0 rgba(0,0,0,0.06)',
+      }}
     >
-      <span
-        className={`absolute top-4 right-4 w-6 h-6 rounded flex items-center justify-center border-2 pointer-events-none ${
-          selected ? 'bg-primary-600 border-primary-600' : 'border-gray-300 bg-white'
-        }`}
-        aria-hidden
-      >
-        {selected && <Check className="w-4 h-4 text-white" strokeWidth={3} />}
-      </span>
-      <div className="flex flex-col gap-3">
+      {/* Checkbox solo si la red está autenticada */}
+      {authenticated && (
+        <span
+          className="absolute top-4 right-4 w-6 h-6 rounded flex items-center justify-center border-2 pointer-events-none"
+          style={{
+            background: selected ? 'var(--button-primary)' : 'var(--surface-0)',
+            borderColor: selected ? 'var(--button-primary)' : 'var(--input-border)',
+          }}
+          aria-hidden
+        >
+          {selected && <Check className="w-4 h-4 text-white" strokeWidth={3} />}
+        </span>
+      )}
+
+      <div className="flex flex-col gap-3 items-start">
         <NetworkLogo id={network.logo} />
         <div>
-          <p className="font-semibold text-gray-900">{network.name}</p>
-          <p className="text-sm text-gray-500 mt-0.5">{network.subtitle}</p>
+          <p className="font-semibold" style={{ color: 'var(--copy-primary)' }}>
+            {network.name}
+          </p>
+          {authenticated ? (
+            <>
+              <span
+                className="inline-block mt-1.5 px-2 py-0.5 rounded-full text-xs font-medium"
+                style={{
+                  background: 'var(--color-teal-100)',
+                  color: 'var(--color-teal-700)',
+                }}
+              >
+                Authenticated
+              </span>
+              <p className="text-sm mt-1.5" style={{ color: 'var(--copy-tertiary)' }}>
+                {network.subtitle}
+              </p>
+              {onDisconnect && (
+                <div className="mt-4 flex flex-col gap-1.5 w-full" onClick={(e) => e.stopPropagation()}>
+                  <Button
+                    onPress={onDisconnect}
+                    className="titan-btn-tertiary w-fit text-sm py-1.5 px-0"
+                  >
+                    Revoke access
+                  </Button>
+                  <p
+                    className="text-xs"
+                    style={{
+                      fontSize: '12px',
+                      color: 'var(--copy-tertiary)',
+                      lineHeight: 'var(--font-leading-s, 1.25)',
+                    }}
+                  >
+                    Desconecta esta cuenta para dejar de sincronizar datos con Audiense.
+                  </p>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="mt-1.5 flex flex-col gap-2" onClick={(e) => e.stopPropagation()}>
+              <p className="text-sm" style={{ color: 'var(--copy-tertiary)' }}>
+                {network.subtitle}
+              </p>
+              {onConnect && (
+                <Button
+                  onPress={onConnect}
+                  className="titan-btn-secondary w-fit text-sm py-1.5 px-3 mt-4"
+                >
+                  Authenticate account
+                </Button>
+              )}
+              <p
+                className="text-xs"
+                style={{
+                  fontSize: '12px',
+                  color: 'var(--copy-tertiary)',
+                  lineHeight: 'var(--font-leading-s, 1.25)',
+                }}
+              >
+                Connect your account to use this network
+              </p>
+            </div>
+          )}
         </div>
       </div>
-    </button>
+    </Button>
   )
 }
