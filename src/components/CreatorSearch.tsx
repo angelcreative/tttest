@@ -1477,7 +1477,7 @@ export function CreatorSearch({ onBack }: CreatorSearchProps) {
         </div>
       )}
 
-      {/* Modal: Detalle del creador (See profile insights) — vídeos Pexels */}
+      {/* Modal: Creator insights — vídeos Pexels */}
       {insightsCreator && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40" aria-hidden onClick={() => setInsightsCreator(null)} />
@@ -1486,7 +1486,7 @@ export function CreatorSearch({ onBack }: CreatorSearchProps) {
             style={{ background: 'var(--surface-page)', borderColor: 'var(--divider)' }}
           >
             <div className="flex-shrink-0 flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: 'var(--divider)' }}>
-              <h2 className="text-xl font-semibold" style={{ color: 'var(--copy-primary)' }}>Detalle del creador</h2>
+              <h2 className="text-xl font-semibold" style={{ color: 'var(--copy-primary)' }}>Creator insights</h2>
               <Button
                 onPress={() => setInsightsCreator(null)}
                 className="rounded-full p-2"
