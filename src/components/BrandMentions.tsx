@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
-import { ArrowLeft, MessageCircle, Heart, RefreshCw, Bookmark } from 'lucide-react'
+import { ArrowLeft, MessageCircle, Heart, Bookmark } from 'lucide-react'
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from 'react-aria-components'
 import { TitanButton, TitanIconButton, TitanInputField } from 'titan-compositions'
 import { generateBrandMentionPosts, brandMentionPosts } from '../data/brandMentions'
@@ -236,7 +236,7 @@ function RequestPermissionDialog({
                   id="request-campaign"
                   value={campaignId}
                   onChange={(e) => setCampaignId(e.target.value)}
-                  className="w-full rounded-[var(--input-slot-radius)] border mb-6 min-h-[var(--input-slot-height)] px-[var(--input-slot-pad-x)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring-color)]"
+                  className="select-native w-full rounded-[var(--input-slot-radius)] border mb-6 min-h-[var(--input-slot-height)] px-[var(--input-slot-pad-x)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring-color)]"
                   style={{
                     borderWidth: 'var(--stroke-slot-width)',
                     borderColor: 'var(--input-slot-border)',
@@ -330,24 +330,24 @@ export function BrandMentions({ onBack }: BrandMentionsProps) {
 
       {/* Tabs + content: takes remaining space and scrolls */}
       <Tabs selectedKey={activeTab} onSelectionChange={(k) => setActiveTab(k as 'mention' | 'hashtag')} className="tabs-root flex-1 flex flex-col min-h-0 px-6" style={{ background: 'transparent' }}>
-        <TabList className="tabs-list flex-shrink-0" style={{ background: 'transparent' }}>
-          <Tab id="mention" className="tab-trigger">
-            @ Mentions
-          </Tab>
-          <Tab id="hashtag" className="tab-trigger">
-            # Hashtag Mentions
-          </Tab>
-        </TabList>
-
-        {/* Sort by, Time period (select nativo con estilos Titan), Refresh (TitanButton) */}
-        <div className="flex flex-wrap items-center gap-4 mb-4 flex-shrink-0">
+        {/* Fila: tabs a la izquierda; Sort by + Time period a la derecha (sin Refresh) */}
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-4 flex-shrink-0">
+          <TabList className="tabs-list flex-shrink-0" style={{ background: 'transparent' }}>
+            <Tab id="mention" className="tab-trigger">
+              @ Mentions
+            </Tab>
+            <Tab id="hashtag" className="tab-trigger">
+              # Hashtag Mentions
+            </Tab>
+          </TabList>
+          <div className="flex flex-wrap items-center gap-4">
             <label className="flex items-center gap-2" style={{ fontSize: 'var(--font-size-s)', color: 'var(--copy-slot-secondary)' }}>
               Sort by:
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
                 aria-label="Sort by"
-                className="select-trigger min-h-[var(--select-slot-button-height)] rounded-[var(--select-slot-button-radius)] border border-[var(--select-slot-button-border)] bg-[var(--select-slot-button-bg)] px-[var(--input-slot-pad-x)] text-[var(--button-slot-font-size)]"
+                className="select-native min-h-[var(--select-slot-button-height)] rounded-[var(--select-slot-button-radius)] border border-[var(--select-slot-button-border)] bg-[var(--select-slot-button-bg)] px-[var(--input-slot-pad-x)] text-[var(--button-slot-font-size)]"
                 style={{ color: 'var(--copy-slot-primary)' }}
               >
                 <option value="recent">Most Recent</option>
@@ -361,7 +361,7 @@ export function BrandMentions({ onBack }: BrandMentionsProps) {
                 value={timePeriod}
                 onChange={(e) => setTimePeriod(e.target.value)}
                 aria-label="Time period"
-                className="select-trigger min-h-[var(--select-slot-button-height)] rounded-[var(--select-slot-button-radius)] border border-[var(--select-slot-button-border)] bg-[var(--select-slot-button-bg)] px-[var(--input-slot-pad-x)] text-[var(--button-slot-font-size)]"
+                className="select-native min-h-[var(--select-slot-button-height)] rounded-[var(--select-slot-button-radius)] border border-[var(--select-slot-button-border)] bg-[var(--select-slot-button-bg)] px-[var(--input-slot-pad-x)] text-[var(--button-slot-font-size)]"
                 style={{ color: 'var(--copy-slot-primary)' }}
               >
                 <option value="7">Last 7 days</option>
@@ -369,10 +369,8 @@ export function BrandMentions({ onBack }: BrandMentionsProps) {
                 <option value="90">Last 90 days</option>
               </select>
             </label>
-            <TitanButton variant="secondary" icon={<RefreshCw />} onPress={() => {}}>
-              Refresh
-            </TitanButton>
           </div>
+        </div>
 
           <TabPanels className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden pb-6">
             <TabPanel id="mention" className="outline-none py-2">
