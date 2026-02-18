@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
-import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react'
 import { TitanButton, TitanIconButton } from 'titan-compositions'
 import type { NetworkId } from '../data/networks'
 import { networks } from '../data/networks'
 import { AuthDialog } from './AuthDialog'
 import { NetworkCard } from './NetworkCard'
 
-const LOADER_URL = 'https://angelcreative.github.io/tttest/loader.png'
+/** Loader: ruta absoluta desde la raíz del sitio (archivo en public/assets/ o public/loader.png) */
+const LOADER_IMG_URL = '/assets/loader-l.gif'
 const LOADING_MS = 400
 
 type Phase = 'cards' | 'loading'
@@ -24,6 +25,7 @@ export function NetworkSelect({ onBack, onNext, onContinueToCreatorSearch }: Net
   const [connectedIds, setConnectedIds] = useState<Set<NetworkId>>(() => new Set())
   const [phase, setPhase] = useState<Phase>('cards')
   const [pendingAuthNetworkId, setPendingAuthNetworkId] = useState<NetworkId | null>(null)
+  const [loaderImgError, setLoaderImgError] = useState(false)
 
   const isAuthenticated = (id: NetworkId) => {
     const net = networks.find((n) => n.id === id)
@@ -52,6 +54,7 @@ export function NetworkSelect({ onBack, onNext, onContinueToCreatorSearch }: Net
       if (networkIdToAdd) setConnectedIds((prev) => new Set(prev).add(networkIdToAdd))
       setPendingAuthNetworkId(null)
       setPhase('cards')
+      setLoaderImgError(false)
       onContinueToCreatorSearch?.()
     }, LOADING_MS)
     return () => clearTimeout(t)
@@ -79,13 +82,24 @@ export function NetworkSelect({ onBack, onNext, onContinueToCreatorSearch }: Net
           aria-live="polite"
           aria-busy="true"
         >
-          <img
-            src={LOADER_URL}
-            alt=""
-            width={120}
-            height={120}
-            className="w-[120px] h-[120px] object-contain"
-          />
+          {loaderImgError ? (
+            <span
+              className="flex items-center justify-center flex-shrink-0"
+              style={{ width: 48, height: 48, color: 'var(--copy-slot-secondary)' }}
+              aria-hidden
+            >
+              <Loader2 className="w-8 h-8 animate-spin" strokeWidth={2} />
+            </span>
+          ) : (
+            <img
+              src={LOADER_IMG_URL}
+              alt=""
+              width={48}
+              height={48}
+              className="w-12 h-12 object-contain flex-shrink-0"
+              onError={() => setLoaderImgError(true)}
+            />
+          )}
           <p className="text-sm m-0" style={{ color: 'var(--copy-secondary)' }}>
             Loading....
           </p>

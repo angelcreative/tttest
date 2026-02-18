@@ -721,16 +721,18 @@ export function CreatorSearch({ onBack }: CreatorSearchProps) {
   return (
     <div className="flex-1 flex flex-col min-w-0 overflow-auto" style={{ background: 'var(--surface-page)' }}>
       <div
-        className="flex-shrink-0 flex flex-wrap items-center justify-between gap-4 px-6 pt-6 pb-4"
+        className="flex-shrink-0 px-6 pt-6 pb-4"
         style={{ background: 'var(--surface-page)' }}
       >
-        <div className="flex items-center gap-3 min-w-0">
-          <TitanIconButton variant="ghost" aria-label="Back" onPress={onBack} className="shrink-0">
-            <ArrowLeft />
-          </TitanIconButton>
-          <h1 className="text-2xl font-semibold truncate" style={{ color: 'var(--copy-primary)' }}>
-            Campaign collab
-          </h1>
+        <ConnectedAccountBox className="mb-3" />
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0">
+            <TitanIconButton variant="ghost" aria-label="Back" onPress={onBack} className="shrink-0">
+              <ArrowLeft />
+            </TitanIconButton>
+            <h1 className="text-2xl font-semibold truncate" style={{ color: 'var(--copy-primary)' }}>
+              Campaign collab
+            </h1>
           <div className="ml-2 min-w-0 max-w-[180px]">
             <MenuTrigger>
               <TitanButton
@@ -797,11 +799,7 @@ export function CreatorSearch({ onBack }: CreatorSearchProps) {
             </Popover>
           </MenuTrigger>
         </div>
-      </div>
-
-      {/* Connected Account — componente Titan */}
-      <div className="flex-shrink-0 mx-6 mb-4">
-        <ConnectedAccountBox />
+        </div>
       </div>
 
       {/* Fila: columna FAB fija 72px + contenido (menú en cascada Titan compliant) */}

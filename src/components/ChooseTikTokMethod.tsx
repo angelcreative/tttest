@@ -56,7 +56,7 @@ export function ChooseTikTokMethod({ onBack, onNext }: ChooseTikTokMethodProps) 
 
       <div className="flex-1 px-6 py-6 min-w-0" style={{ background: 'var(--surface-page)' }}>
         <div className="max-w-3xl mx-auto">
-          <ConnectedAccountBox className="mb-6" />
+          <ConnectedAccountBox className="mb-4" />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {methods.map((method) => (

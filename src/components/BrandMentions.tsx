@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
-import { ArrowLeft, MessageCircle, Heart, Bookmark } from 'lucide-react'
-import { Tabs, TabList, TabPanels, Tab, TabPanel } from 'react-aria-components'
+import { createPortal } from 'react-dom'
+import { ArrowLeft, MessageCircle, Heart, Bookmark, ChevronDown } from 'lucide-react'
+import { Tabs, TabList, TabPanels, Tab, TabPanel, Select, Label, Button as AriaButton, SelectValue, Popover, ListBox, ListBoxItem } from 'react-aria-components'
 import { TitanButton, TitanIconButton, TitanInputField } from 'titan-compositions'
 import { generateBrandMentionPosts, brandMentionPosts } from '../data/brandMentions'
 import type { BrandMentionPost } from '../data/brandMentions'
@@ -170,7 +171,7 @@ function RequestPermissionDialog({
         onClick={onClose}
       />
       <div
-        className="relative flex w-full max-w-4xl max-h-[90vh] rounded-xl overflow-hidden"
+        className="relative flex max-h-[90vh] rounded-xl overflow-hidden"
         style={{
           background: 'var(--dialog-background, var(--surface-0))',
           boxShadow: 'var(--dialog-shadow, var(--elevation-shadow-l))',
@@ -191,74 +192,83 @@ function RequestPermissionDialog({
           />
         </div>
 
-        {/* Derecha: cabecera + Select campaign + Send request / confirmación */}
-        <div className="flex-1 flex flex-col min-w-0">
-          <div className="flex items-start gap-3 p-4 flex-shrink-0" style={{ borderBottom: 'var(--stroke-slot-width) solid var(--divider)' }}>
+        {/* Derecha: ancho justo para el form (cabecera + select + botones) */}
+        <div className="flex flex-col flex-shrink-0" style={{ width: 360 }}>
+          <header
+            className="flex items-start gap-3 flex-shrink-0"
+            style={{
+              padding: 'var(--spacing-m, 16px)',
+              borderBottom: 'var(--stroke-slot-width) solid var(--divider)',
+            }}
+          >
             <img
               src={post.avatarUrl}
               alt=""
-              className="w-12 h-12 rounded-full object-cover flex-shrink-0"
+              className="w-11 h-11 rounded-full object-cover flex-shrink-0"
               style={{ background: 'var(--surface-1)' }}
               onError={(e) => {
                 (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(post.userName)}&size=96&background=dee2e6`
               }}
             />
             <div className="flex-1 min-w-0">
-              <p className="font-semibold truncate" style={{ color: 'var(--copy-primary)' }}>{post.userName}</p>
-              <p className="text-sm truncate" style={{ color: 'var(--copy-slot-secondary)' }}>{post.handle}</p>
-              <h2 id="request-dialog-title" className="text-lg font-semibold mt-1" style={{ color: 'var(--copy-primary)' }}>
+              <p className="font-semibold truncate m-0" style={{ color: 'var(--copy-primary)', fontSize: 'var(--font-size-m)' }}>{post.userName}</p>
+              <p className="truncate m-0 mt-0.5" style={{ color: 'var(--copy-slot-secondary)', fontSize: 'var(--font-size-s)' }}>{post.handle}</p>
+              <h2 id="request-dialog-title" className="m-0 mt-1 font-medium" style={{ color: 'var(--copy-primary)', fontSize: 'var(--font-size-m)' }}>
                 Request permission
               </h2>
             </div>
-          </div>
+          </header>
 
-          <div className="p-4 flex-1 flex flex-col min-h-0 overflow-auto">
+          <div className="flex-1 flex flex-col min-h-0 overflow-auto" style={{ padding: 'var(--spacing-m, 16px)' }}>
             {sent ? (
               <>
-                <div className="flex flex-col items-center text-center py-6 flex-1">
-                  <p className="font-semibold text-lg m-0" style={{ color: 'var(--copy-primary)' }}>Request sent!</p>
-                  <p className="text-sm mt-2 m-0" style={{ color: 'var(--copy-secondary)' }}>
+                <div className="flex flex-col items-center text-center flex-1" style={{ paddingBlock: 'var(--spacing-l, 24px)' }}>
+                  <p className="font-medium m-0" style={{ color: 'var(--copy-primary)', fontSize: 'var(--font-size-m)' }}>Request sent!</p>
+                  <p className="m-0 mt-2" style={{ color: 'var(--copy-slot-secondary)', fontSize: 'var(--font-size-s)' }}>
                     We&apos;ve notified {post.userName}. You&apos;ll be alerted when they approve the link.
                   </p>
                 </div>
-                <div className="flex-shrink-0 flex justify-center">
+                <div className="flex-shrink-0 flex justify-center" style={{ marginTop: 'var(--spacing-m, 16px)' }}>
                   <TitanButton variant="primary" onPress={onClose}>
                     Done
                   </TitanButton>
                 </div>
               </>
             ) : (
-              <>
-                <label htmlFor="request-campaign" className="block text-sm font-medium mb-1.5" style={{ color: 'var(--copy-slot-primary)', fontSize: 'var(--font-size-s)' }}>
-                  Select campaign
-                </label>
-                <select
-                  id="request-campaign"
-                  value={campaignId}
-                  onChange={(e) => setCampaignId(e.target.value)}
-                  className="select-native w-full rounded-[var(--input-slot-radius)] border mb-6 min-h-[var(--input-slot-height)] px-[var(--input-slot-pad-x)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring-color)]"
-                  style={{
-                    borderWidth: 'var(--stroke-slot-width)',
-                    borderColor: 'var(--input-slot-border)',
-                    background: 'var(--input-slot-bg)',
-                    color: 'var(--copy-slot-primary)',
-                    fontSize: 'var(--font-size-s)',
-                  }}
+              <div className="flex flex-col" style={{ maxWidth: 'min(100%, 320px)' }}>
+                <Select
+                  className="select-root"
+                  selectedKey={campaignId || '__none'}
+                  onSelectionChange={(k) => setCampaignId(k === '__none' || k == null ? '' : String(k))}
+                  aria-label="Select campaign"
                 >
-                  <option value="">Choose a campaign</option>
-                  {CAMPAIGNS_SEED.map((c) => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
-                  ))}
-                </select>
-                <div className="flex gap-3 flex-shrink-0">
-                  <TitanButton variant="secondary" onPress={onClose} className="flex-1 justify-center">
+                  <Label className="select-label">Select campaign</Label>
+                  <AriaButton className="select-trigger">
+                    <SelectValue />
+                    <span className="select-trigger-chevron" aria-hidden><ChevronDown /></span>
+                  </AriaButton>
+                  <Popover className="select-popover" placement="bottom start">
+                    <ListBox className="select-list">
+                      <ListBoxItem id="__none" className="select-item" textValue="Choose a campaign">
+                        Choose a campaign
+                      </ListBoxItem>
+                      {CAMPAIGNS_SEED.map((c) => (
+                        <ListBoxItem key={c.id} id={c.id} className="select-item" textValue={c.name}>
+                          {c.name}
+                        </ListBoxItem>
+                      ))}
+                    </ListBox>
+                  </Popover>
+                </Select>
+                <div className="flex justify-between gap-3 flex-shrink-0" style={{ marginTop: 'var(--spacing-l, 24px)' }}>
+                  <TitanButton variant="secondary" onPress={onClose}>
                     Cancel
                   </TitanButton>
-                  <TitanButton variant="primary" onPress={handleSend} isDisabled={!campaignId} className="flex-1 justify-center">
+                  <TitanButton variant="primary" onPress={handleSend} isDisabled={!campaignId}>
                     Send request
                   </TitanButton>
                 </div>
-              </>
+              </div>
             )}
           </div>
         </div>
@@ -281,6 +291,12 @@ export function BrandMentions({ onBack }: BrandMentionsProps) {
   const [saveSearchOpen, setSaveSearchOpen] = useState(false)
   const [saveSearchName, setSaveSearchName] = useState('')
   const [saveSearchConfirmed, setSaveSearchConfirmed] = useState(false)
+  const selectsSlotRef = useRef<HTMLDivElement | null>(null) as React.MutableRefObject<HTMLDivElement | null>
+  const [selectsSlotReady, setSelectsSlotReady] = useState(false)
+
+  useEffect(() => {
+    if (selectsSlotRef.current) setSelectsSlotReady(true)
+  }, [])
 
   const openRequestDialog = (post: BrandMentionPost) => {
     setSelectedPost(post)
@@ -307,9 +323,10 @@ export function BrandMentions({ onBack }: BrandMentionsProps) {
 
   return (
     <div className="flex-1 flex flex-col min-h-0 min-w-0" style={{ background: 'var(--surface-page)' }}>
-      {/* Header + Connected: fixed height */}
+      {/* Tag cuenta conectada sobre el título + header */}
       <div className="flex-shrink-0 px-6 pt-6 pb-4">
-        <div className="flex items-center justify-between gap-4 mb-4">
+        <ConnectedAccountBox className="mb-3" />
+        <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
             <TitanIconButton variant="ghost" aria-label="Back" onPress={onBack} className="shrink-0">
               <ArrowLeft />
@@ -323,14 +340,11 @@ export function BrandMentions({ onBack }: BrandMentionsProps) {
             Save search
           </TitanButton>
         </div>
-
-        {/* Connected Account — componente Titan */}
-        <ConnectedAccountBox className="mb-4" />
       </div>
 
-      {/* Tabs + content: takes remaining space and scrolls */}
+      {/* Tabs + content: takes remaining space and scrolls. Selects se renderan por portal fuera de Tabs para evitar selectionManager. */}
       <Tabs selectedKey={activeTab} onSelectionChange={(k) => setActiveTab(k as 'mention' | 'hashtag')} className="tabs-root flex-1 flex flex-col min-h-0 px-6" style={{ background: 'transparent' }}>
-        {/* Fila: tabs a la izquierda; Sort by + Time period a la derecha (sin Refresh) */}
+        {/* Fila: tabs a la izquierda; slot para Sort by + Time period (portaled) a la derecha */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-4 flex-shrink-0">
           <TabList className="tabs-list flex-shrink-0" style={{ background: 'transparent' }}>
             <Tab id="mention" className="tab-trigger">
@@ -340,36 +354,13 @@ export function BrandMentions({ onBack }: BrandMentionsProps) {
               # Hashtag Mentions
             </Tab>
           </TabList>
-          <div className="flex flex-wrap items-center gap-4">
-            <label className="flex items-center gap-2" style={{ fontSize: 'var(--font-size-s)', color: 'var(--copy-slot-secondary)' }}>
-              Sort by:
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                aria-label="Sort by"
-                className="select-native min-h-[var(--select-slot-button-height)] rounded-[var(--select-slot-button-radius)] border border-[var(--select-slot-button-border)] bg-[var(--select-slot-button-bg)] px-[var(--input-slot-pad-x)] text-[var(--button-slot-font-size)]"
-                style={{ color: 'var(--copy-slot-primary)' }}
-              >
-                <option value="recent">Most Recent</option>
-                <option value="views">Most Views</option>
-                <option value="likes">Most Likes</option>
-              </select>
-            </label>
-            <label className="flex items-center gap-2" style={{ fontSize: 'var(--font-size-s)', color: 'var(--copy-slot-secondary)' }}>
-              Time period:
-              <select
-                value={timePeriod}
-                onChange={(e) => setTimePeriod(e.target.value)}
-                aria-label="Time period"
-                className="select-native min-h-[var(--select-slot-button-height)] rounded-[var(--select-slot-button-radius)] border border-[var(--select-slot-button-border)] bg-[var(--select-slot-button-bg)] px-[var(--input-slot-pad-x)] text-[var(--button-slot-font-size)]"
-                style={{ color: 'var(--copy-slot-primary)' }}
-              >
-                <option value="7">Last 7 days</option>
-                <option value="30">Last 30 days</option>
-                <option value="90">Last 90 days</option>
-              </select>
-            </label>
-          </div>
+          <div
+            ref={(el) => {
+              selectsSlotRef.current = el
+              if (el) setSelectsSlotReady(true)
+            }}
+            className="flex flex-wrap items-center gap-4"
+          />
         </div>
 
           <TabPanels className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden pb-6">
@@ -415,6 +406,66 @@ export function BrandMentions({ onBack }: BrandMentionsProps) {
             </TabPanel>
           </TabPanels>
         </Tabs>
+
+      {/* Sort by + Time period: renderizados fuera del árbol Tabs (portal al slot) para evitar selectionManager */}
+      {selectsSlotReady && selectsSlotRef.current &&
+        createPortal(
+          <>
+            <Select
+              className="select-root"
+              selectedKey={sortBy}
+              onSelectionChange={(k) => k != null && setSortBy(String(k))}
+              aria-label="Sort by"
+              isDisabled={false}
+            >
+              <Label className="select-label">Sort by</Label>
+              <AriaButton className="select-trigger">
+                <SelectValue />
+                <span className="select-trigger-chevron" aria-hidden><ChevronDown /></span>
+              </AriaButton>
+              <Popover className="select-popover" placement="bottom start">
+                <ListBox className="select-list">
+                  {[
+                    { id: 'recent', label: 'Most Recent' },
+                    { id: 'views', label: 'Most Views' },
+                    { id: 'likes', label: 'Most Likes' },
+                  ].map((option) => (
+                    <ListBoxItem key={option.id} id={option.id} className="select-item" textValue={option.label}>
+                      <span className="select-item-start"><span>{option.label}</span></span>
+                    </ListBoxItem>
+                  ))}
+                </ListBox>
+              </Popover>
+            </Select>
+            <Select
+              className="select-root"
+              selectedKey={timePeriod}
+              onSelectionChange={(k) => k != null && setTimePeriod(String(k))}
+              aria-label="Time period"
+              isDisabled={false}
+            >
+              <Label className="select-label">Time period</Label>
+              <AriaButton className="select-trigger">
+                <SelectValue />
+                <span className="select-trigger-chevron" aria-hidden><ChevronDown /></span>
+              </AriaButton>
+              <Popover className="select-popover" placement="bottom start">
+                <ListBox className="select-list">
+                  {[
+                    { id: '7', label: 'Last 7 days' },
+                    { id: '30', label: 'Last 30 days' },
+                    { id: '90', label: 'Last 90 days' },
+                  ].map((option) => (
+                    <ListBoxItem key={option.id} id={option.id} className="select-item" textValue={option.label}>
+                      <span className="select-item-start"><span>{option.label}</span></span>
+                    </ListBoxItem>
+                  ))}
+                </ListBox>
+              </Popover>
+            </Select>
+          </>,
+          selectsSlotRef.current
+        )}
 
       {selectedPost && (
         <RequestPermissionDialog

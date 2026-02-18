@@ -1,8 +1,8 @@
-import { User } from 'lucide-react'
+import { Plug } from 'lucide-react'
 
 /**
- * Caja de cuenta conectada — 100% Titan (tokens semánticos: surface, card, copy-slot).
- * Sin hex ni --color-* primitivos.
+ * Tag compacto de cuenta conectada: icono plug + @handle.
+ * Va sobre el título para ganar espacio (Brand mentions, Creator search, etc.).
  */
 interface ConnectedAccountBoxProps {
   /** Handle de la cuenta (ej. @adidas). */
@@ -13,67 +13,33 @@ interface ConnectedAccountBoxProps {
 
 export function ConnectedAccountBox({ handle = '@adidas', className = '' }: ConnectedAccountBoxProps) {
   return (
-    <div
+    <span
       className={className}
       style={{
-        display: 'flex',
+        display: 'inline-flex',
         alignItems: 'center',
-        gap: 'var(--spacing-m)',
-        padding: 'var(--spacing-s) var(--spacing-m)',
-        background: 'var(--surface-1)',
+        gap: 'var(--spacing-2xs, 6px)',
+        padding: 'var(--spacing-2xs, 6px) var(--spacing-s, 12px)',
+        background: 'var(--pill-background, var(--surface-1))',
         border: 'var(--stroke-slot-width) solid var(--card-border)',
-        borderRadius: 'var(--card-radius)',
+        borderRadius: 'var(--pill-radius, var(--radius-pill, 9999px))',
+        fontSize: 'var(--font-size-s)',
+        fontWeight: 'var(--text-weight-medium)',
+        color: 'var(--copy-slot-primary)',
       }}
+      aria-label={`Connected account ${handle}`}
     >
-      <div
+      <Plug
         style={{
-          width: 'var(--spacing-xl)',
-          height: 'var(--spacing-xl)',
+          width: 'var(--icon-size-s, 14px)',
+          height: 'var(--icon-size-s, 14px)',
+          color: 'var(--copy-slot-secondary)',
           flexShrink: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          borderRadius: '9999px',
-          background: 'var(--surface-0)',
         }}
+        strokeWidth={2}
         aria-hidden
-      >
-        <User
-          style={{
-            width: 'var(--icon-size-m)',
-            height: 'var(--icon-size-m)',
-            color: 'var(--copy-slot-secondary)',
-            strokeWidth: 'var(--icon-stroke-m)',
-          }}
-        />
-      </div>
-      <div style={{ minWidth: 0 }}>
-        <p
-          style={{
-            margin: 0,
-            fontSize: 'var(--font-size-s)',
-            lineHeight: 'var(--font-leading-s)',
-            fontWeight: 'var(--text-weight-medium)',
-            color: 'var(--copy-slot-secondary)',
-          }}
-        >
-          Connected Account:
-        </p>
-        <p
-          style={{
-            margin: 0,
-            fontSize: 'var(--font-size-s)',
-            lineHeight: 'var(--font-leading-s)',
-            fontWeight: 'var(--text-weight-semibold)',
-            color: 'var(--copy-slot-primary)',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {handle}
-        </p>
-      </div>
-    </div>
+      />
+      <span>{handle}</span>
+    </span>
   )
 }
