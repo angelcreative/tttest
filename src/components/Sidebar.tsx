@@ -1,5 +1,6 @@
 import { Button } from 'react-aria-components'
 import { Home, FileText, Scale, Telescope, LayoutGrid, ChevronLeft, ChevronRight } from 'lucide-react'
+import { TitanIconButton } from 'titan-compositions'
 
 type SidebarItemId = 'home' | 'all-reports' | 'audience-overlap' | 'creator-discovery' | 'more'
 
@@ -26,31 +27,22 @@ export function Sidebar({ collapsed = true, onToggle }: SidebarProps) {
 
   return (
     <aside
-      className="titan-sidebar flex flex-col flex-shrink-0 border-r border-[var(--divider)]"
-      style={{ width: collapsed ? '72px' : '14rem' }}
+      className="sidebar"
       data-expanded={!collapsed}
     >
-      {/* Expand/collapse — encima de Home */}
-      <Button
-        onPress={onToggle}
-        className="titan-sidebar-icon-btn mb-2"
+      <TitanIconButton
+        variant="ghost"
         aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        onPress={onToggle}
+        className="sidebar-toggle"
       >
-        {collapsed ? (
-          <ChevronRight className="w-5 h-5 shrink-0" strokeWidth={1.5} />
-        ) : (
-          <ChevronLeft className="w-5 h-5 shrink-0" strokeWidth={1.5} />
-        )}
-      </Button>
+        {collapsed ? <ChevronRight /> : <ChevronLeft />}
+      </TitanIconButton>
 
       {SIDEBAR_STRUCTURE.map((row) => {
         if (row.type === 'header') {
           return (
-            <div
-              key={row.label}
-              className="titan-sidebar-header px-4 pt-4 pb-1 text-xs font-semibold uppercase tracking-wider"
-              style={{ color: 'var(--copy-tertiary)' }}
-            >
+            <div key={row.label} className="sidebar-header">
               {row.label}
             </div>
           )
@@ -60,12 +52,16 @@ export function Sidebar({ collapsed = true, onToggle }: SidebarProps) {
         return (
           <Button
             key={id}
-            className={`titan-sidebar-item ${isActive ? 'is-active' : ''}`}
+            className="menu-item sidebar-item"
             aria-label={label}
             aria-current={isActive ? 'page' : undefined}
           >
-            <Icon className="w-5 h-5 shrink-0" strokeWidth={1.5} />
-            <span className="titan-sidebar-item-label truncate text-left flex-1">{label}</span>
+            <span className="menu-item-start">
+              <span className="menu-item-icon" aria-hidden>
+                <Icon />
+              </span>
+              <span className="sidebar-item-label">{label}</span>
+            </span>
           </Button>
         )
       })}

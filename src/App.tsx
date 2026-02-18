@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { AppLayout } from './layout/AppLayout'
 import { CreatorDiscoveryHome } from './components/CreatorDiscoveryHome'
 import { CreatorSearch } from './components/CreatorSearch'
@@ -7,10 +7,13 @@ import { ChooseTikTokMethod } from './components/ChooseTikTokMethod'
 import { NetworkSelect } from './components/NetworkSelect'
 import type { NetworkId } from './data/networks'
 import type { TikTokMethodId } from './components/ChooseTikTokMethod'
+import type { BreadcrumbItem } from './components/Breadcrumb'
 
 type MainView = 'creator-discovery' | 'select-network' | 'choose-method' | 'creator-search' | 'brand-mentions'
 
-const BREADCRUMB_BY_VIEW: Record<MainView, { label: string; current?: boolean }[]> = {
+const VIEW_ORDER: MainView[] = ['creator-discovery', 'select-network', 'choose-method']
+
+const BREADCRUMB_LABELS_BY_VIEW: Record<MainView, { label: string; current?: boolean }[]> = {
   'creator-discovery': [{ label: 'Home', current: true }],
   'select-network': [{ label: 'Home' }, { label: 'Select your network', current: true }],
   'choose-method': [
@@ -32,6 +35,14 @@ const BREADCRUMB_BY_VIEW: Record<MainView, { label: string; current?: boolean }[
   ],
 }
 
+function getBreadcrumbItems(view: MainView, setView: (v: MainView) => void): BreadcrumbItem[] {
+  const rows = BREADCRUMB_LABELS_BY_VIEW[view]
+  return rows.map((row, i) => ({
+    ...row,
+    onPress: row.current ? undefined : () => setView(i < VIEW_ORDER.length ? VIEW_ORDER[i] : view),
+  }))
+}
+
 function App() {
   const [view, setView] = useState<MainView>('creator-discovery')
 
@@ -40,8 +51,10 @@ function App() {
     else setView('brand-mentions')
   }
 
+  const breadcrumbItems = useMemo(() => getBreadcrumbItems(view, setView), [view])
+
   return (
-    <AppLayout breadcrumbItems={BREADCRUMB_BY_VIEW[view]}>
+    <AppLayout breadcrumbItems={breadcrumbItems}>
       {view === 'creator-discovery' && (
         <CreatorDiscoveryHome onFindCreators={() => setView('select-network')} />
       )}

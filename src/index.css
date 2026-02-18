@@ -19,134 +19,64 @@ body {
   overscroll-behavior: none;
 }
 
-/* Navbar — Titan slots */
-.titan-navbar {
-  background: var(--navbar-slot-bg);
-  padding-left: var(--navbar-slot-pad-x);
-  padding-right: var(--navbar-slot-pad-x);
-  padding-top: var(--navbar-slot-pad-y);
-  padding-bottom: var(--navbar-slot-pad-y);
-  min-height: 70px;
-  border-bottom: 1px solid var(--divider, rgba(0,0,0,0.08));
+/* Titan .btn disabled — so Next etc. show disabled until authenticated card selected */
+.btn[data-disabled],
+.btn[aria-disabled="true"],
+.btn-primary[data-disabled],
+.btn-primary[aria-disabled="true"] {
+  background: var(--button-disabled, var(--color-black-200));
+  color: var(--copy-disabled, var(--copy-tertiary));
+  cursor: not-allowed;
+  opacity: 1;
 }
 
-.titan-navbar-icon-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-icon-only, 9999px);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--icon-slot-secondary);
-  background: transparent;
-  border: none;
-  cursor: pointer;
+/* Sidebar — 100% Titan (surface-navbar, navbar-slot-border, menu-item-slot-*, button-icon-slot-*, copy-slot-*, spacing, focus-ring) */
+:root {
+  --sidebar-width-collapsed: 72px;
+  --sidebar-width-expanded: 14rem;
 }
 
-.titan-navbar-icon-btn:hover {
-  background: var(--navbar-item-slot-bg-hover);
-  color: var(--icon-slot-secondary-hover);
-}
-
-.titan-navbar-icon-btn:focus-visible {
-  outline: 2px solid var(--focus-ring-color);
-  outline-offset: 2px;
-}
-
-/* Sidebar — Titan slots. Animación expandir/colapsar. */
-.titan-sidebar {
-  background: var(--sidebar-slot-bg);
-  padding: var(--sidebar-slot-pad);
-  width: var(--sidebar-width, 72px);
+.sidebar {
+  width: var(--sidebar-width-collapsed);
+  background: var(--surface-navbar);
+  border-right: var(--stroke-slot-width) solid var(--navbar-slot-border);
+  padding: var(--spacing-s);
   transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
   display: flex;
   flex-direction: column;
-}
-
-/* Colapsado: centrar todos los icon buttons (expandir/contraer + ítems) en la caja */
-.titan-sidebar:not([data-expanded="true"]) {
-  align-items: center;
-}
-
-/* Botón expandir/colapsar — mismo tamaño y centrado que los ítems cuando está colapsado */
-.titan-sidebar-icon-btn {
-  width: var(--button-icon-slot-size, 40px);
-  height: var(--button-icon-slot-size, 40px);
-  min-width: 40px;
-  max-width: 40px;
   flex-shrink: 0;
-  border-radius: var(--button-icon-slot-radius, 9999px);
-  display: inline-flex;
+}
+
+.sidebar[data-expanded="true"] {
+  width: var(--sidebar-width-expanded);
+}
+
+.sidebar:not([data-expanded="true"]) {
   align-items: center;
-  justify-content: center;
-  color: var(--icon-slot-secondary);
-  background: var(--button-icon-slot-bg, transparent);
-  border: none;
-  cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
 }
 
-.titan-sidebar-icon-btn:hover {
-  background: var(--button-icon-slot-bg-hover, var(--surface-slot-hover));
-  color: var(--icon-slot-secondary-hover);
+.sidebar-toggle {
+  flex-shrink: 0;
+  margin-bottom: var(--spacing-s);
 }
 
-.titan-sidebar-icon-btn:focus-visible {
-  outline: 2px solid var(--focus-ring-color);
-  outline-offset: 2px;
-}
-
-.titan-sidebar-item {
-  width: 100%;
-  min-height: 40px;
-  height: 40px;
-  border-radius: var(--radius-control);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-s);
-  padding-left: var(--spacing-2xs);
-  padding-right: var(--spacing-2xs);
-  color: var(--icon-slot-secondary);
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  position: relative;
-  margin-bottom: var(--spacing-2xs);
-  font-size: var(--font-size-m);
-  font-weight: var(--font-weight-500);
-  text-align: left;
-  transition: width 0.22s cubic-bezier(0.4, 0, 0.2, 1),
-    min-width 0.22s cubic-bezier(0.4, 0, 0.2, 1),
-    max-width 0.22s cubic-bezier(0.4, 0, 0.2, 1),
-    border-radius 0.22s cubic-bezier(0.4, 0, 0.2, 1),
-    margin 0.22s cubic-bezier(0.4, 0, 0.2, 1),
-    padding 0.22s cubic-bezier(0.4, 0, 0.2, 1),
-    justify-content 0.22s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.titan-sidebar-item-label {
-  overflow: hidden;
-  white-space: nowrap;
-  max-width: 12rem;
-  opacity: 1;
-  transition: max-width 0.24s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease-out;
-}
-
-.titan-sidebar:not([data-expanded="true"]) .titan-sidebar-item-label {
-  max-width: 0;
-  opacity: 0;
-}
-
-.titan-sidebar-header {
+.sidebar-header {
+  color: var(--copy-slot-secondary);
+  font-size: var(--font-size-s);
+  line-height: var(--font-leading-s);
+  font-weight: var(--text-weight-semibold);
+  letter-spacing: 0.05em;
+  padding-inline: var(--spacing-m);
+  padding-top: var(--spacing-m);
+  padding-bottom: var(--spacing-3xs);
   overflow: hidden;
   max-height: 2.5rem;
   opacity: 1;
   transition: max-height 0.24s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease-out;
 }
 
-.titan-sidebar:not([data-expanded="true"]) .titan-sidebar-header {
+.sidebar:not([data-expanded="true"]) .sidebar-header {
   max-height: 0;
   opacity: 0;
   margin: 0;
@@ -154,62 +84,73 @@ body {
   visibility: hidden;
 }
 
-/* Expandido: ítem con texto, alineado a la izquierda */
-.titan-sidebar[data-expanded="true"] .titan-sidebar-item {
+.sidebar-item {
+  width: 100%;
+  min-height: var(--menu-item-slot-height);
+  border-radius: var(--radius-control);
   justify-content: flex-start;
   padding-left: var(--spacing-s);
+  padding-right: var(--spacing-s);
+  margin-bottom: var(--spacing-2xs);
+  text-align: left;
+  transition: width 0.22s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+    max-width 0.22s cubic-bezier(0.4, 0, 0.2, 1), border-radius 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+    margin 0.22s cubic-bezier(0.4, 0, 0.2, 1), padding 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+    justify-content 0.22s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Colapsado: todos los ítems = Titan icon button, centrados en su caja y alineados con el botón expandir/contraer */
-.titan-sidebar:not([data-expanded="true"]) .titan-sidebar-item {
-  width: var(--button-icon-slot-size, 40px);
-  min-width: 40px;
-  max-width: 40px;
-  height: 40px;
+.sidebar-item .menu-item-start {
+  justify-content: flex-start;
+}
+
+.sidebar-item-label {
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 12rem;
+  opacity: 1;
+  transition: max-width 0.24s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease-out;
+}
+
+.sidebar:not([data-expanded="true"]) .sidebar-item {
+  width: var(--button-icon-slot-size);
+  min-width: var(--button-icon-slot-size);
+  max-width: var(--button-icon-slot-size);
   flex-shrink: 0;
-  border-radius: var(--button-icon-slot-radius, 9999px);
+  border-radius: var(--button-icon-interactive-slot-radius);
   justify-content: center;
-  align-items: center;
-  padding: 0;
-  background: var(--button-icon-slot-bg, transparent);
-  color: var(--icon-slot-secondary);
+  padding-left: 0;
+  padding-right: 0;
 }
 
-.titan-sidebar:not([data-expanded="true"]) .titan-sidebar-item .titan-sidebar-item-label {
+.sidebar:not([data-expanded="true"]) .sidebar-item-label {
+  max-width: 0;
+  opacity: 0;
   position: absolute;
   width: 0;
-  overflow: hidden;
   pointer-events: none;
 }
 
-.titan-sidebar:not([data-expanded="true"]) .titan-sidebar-item:hover {
-  background: var(--button-icon-slot-bg-hover, var(--surface-slot-hover));
-  color: var(--icon-slot-secondary-hover);
+.sidebar-item[data-hovered],
+.sidebar-item[data-focused] {
+  background: var(--menu-item-slot-bg-hover);
 }
 
-.titan-sidebar:not([data-expanded="true"]) .titan-sidebar-item:focus-visible {
-  outline: 2px solid var(--focus-ring-color);
-  outline-offset: 2px;
+.sidebar-item[data-pressed] {
+  background: var(--menu-item-slot-bg-active);
 }
 
-/* Desplegado: ítems = menú (hover/activo con black-100) */
-.titan-sidebar[data-expanded="true"] .titan-sidebar-item:hover {
-  background: var(--sidebar-item-slot-bg-hover);
-  color: var(--icon-slot-secondary-hover);
+.sidebar-item[aria-current="page"] {
+  background: var(--menu-item-slot-bg-selected);
+  color: var(--copy-slot-primary);
 }
 
-.titan-sidebar-item:hover {
-  background: var(--sidebar-item-slot-bg-hover);
-  color: var(--icon-slot-secondary-hover);
+/* Success dialog — Done centrado (Titan .dialog-footer > :only-child empuja a la derecha; anulamos para centrar) */
+.success-dialog-footer {
+  justify-content: center;
 }
-
-.titan-sidebar-item[aria-current="page"],
-.titan-sidebar-item.is-active {
-  background: var(--sidebar-item-slot-bg-selected);
-  color: var(--copy-primary);
+.success-dialog-footer > * {
+  margin-inline-start: 0;
 }
-
-/* Sin borde/barra izquierda de color en sidebar (ni plegado ni desplegado, ni hover ni activo) */
 
 /* Table — Titan borderless */
 .titan-table-wrap {
@@ -277,6 +218,41 @@ body {
   color: var(--copy-disabled, var(--copy-tertiary));
   cursor: not-allowed;
   opacity: 1;
+}
+
+/* FAB — primary icon button, icon size L (Titan tokens only) */
+.fab-primary {
+  width: var(--spacing-4xl);
+  height: var(--spacing-4xl);
+  min-width: var(--spacing-4xl);
+  min-height: var(--spacing-4xl);
+  padding: 0;
+  border: none;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--button-primary-slot-bg);
+  color: var(--button-primary-slot-label);
+  cursor: pointer;
+  box-shadow: var(--elevation-2);
+}
+.fab-primary:hover,
+.fab-primary[data-hovered] {
+  background: var(--button-primary-slot-bg-hover);
+}
+.fab-primary:active,
+.fab-primary[data-pressed] {
+  background: var(--button-primary-slot-bg-active);
+}
+.fab-primary:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+.fab-primary svg {
+  width: var(--font-size-xl);
+  height: var(--font-size-xl);
+  stroke-width: var(--icon-stroke-m, 1.5);
 }
 
 /* Button secondary — Titan compliant */

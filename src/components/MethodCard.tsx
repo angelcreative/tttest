@@ -1,5 +1,6 @@
-import { TikTokLogo } from './TikTokLogo'
+import { Button } from 'react-aria-components'
 import { Check } from 'lucide-react'
+import { TikTokLogo } from './TikTokLogo'
 
 interface MethodCardProps {
   title: string
@@ -8,39 +9,37 @@ interface MethodCardProps {
   onSelect: () => void
 }
 
-/** Reusable selection card with TikTok logo, title, description, and checkbox (Campaign / Brand mentions style). */
+/** Selection card aligned with NetworkCard: same border, selected background, Titan checkbox indicator. */
 export function MethodCard({ title, description, selected, onSelect }: MethodCardProps) {
   return (
-    <button
-      type="button"
-      onClick={onSelect}
-      className={`relative w-full text-left rounded-xl border p-6 transition-colors ${
-        selected
-          ? 'border-[var(--divider)]'
-          : 'bg-white border-[var(--divider)] hover:border-[var(--color-black-200)] hover:bg-[var(--surface-hover)]'
-      }`}
+    <Button
+      onPress={onSelect}
+      className="relative w-full text-left rounded-xl border p-6 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring-color)] focus-visible:ring-offset-2"
       style={{
         borderWidth: '1px',
-        ...(selected ? { background: 'var(--color-teal-100)' } : {}),
+        borderColor: 'var(--divider)',
+        ...(selected ? { background: 'var(--tab-selected-background)' } : {}),
+        boxShadow: 'var(--elevation-shadow-s, none)',
       }}
     >
-      <span
-        className={`absolute top-4 right-4 w-6 h-6 rounded flex items-center justify-center border-2 ${
-          selected
-            ? 'bg-[var(--button-primary)] border-[var(--button-primary)]'
-            : 'border-[var(--color-black-200)] bg-white'
-        }`}
+      {/* Titan-compliant checkbox indicator: same tokens as TitanCheckboxField (.checkbox-box + .checkbox-mark) */}
+      <div
+        className="checkbox-root absolute top-4 right-4 pointer-events-none flex items-center justify-center"
+        data-selected={selected ? true : undefined}
         aria-hidden
       >
-        {selected && <Check className="w-4 h-4 text-white" strokeWidth={3} />}
-      </span>
+        <span className="checkbox-box">
+          <Check className="checkbox-mark" strokeWidth={3} />
+        </span>
+      </div>
+
       <div className="flex gap-4">
         <TikTokLogo className="w-10 h-10 flex-shrink-0" />
         <div className="min-w-0">
-          <p className="font-semibold" style={{ color: 'var(--copy-primary)' }}>{title}</p>
-          <p className="text-sm mt-1" style={{ color: 'var(--copy-tertiary)' }}>{description}</p>
+          <p className="font-semibold m-0" style={{ color: 'var(--copy-primary)' }}>{title}</p>
+          <p className="text-sm mt-1 m-0" style={{ color: 'var(--copy-tertiary)' }}>{description}</p>
         </div>
       </div>
-    </button>
+    </Button>
   )
 }

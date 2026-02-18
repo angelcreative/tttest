@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Button } from 'react-aria-components'
-import { ArrowLeft, ArrowRight, CheckCircle } from 'lucide-react'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { TitanButton, TitanIconButton } from 'titan-compositions'
 import type { NetworkId } from '../data/networks'
 import { networks } from '../data/networks'
 import { AuthDialog } from './AuthDialog'
@@ -9,12 +9,11 @@ import { NetworkCard } from './NetworkCard'
 const LOADER_URL = 'https://angelcreative.github.io/tttest/loader.png'
 const LOADING_MS = 400
 
-type Phase = 'cards' | 'loading' | 'success'
+type Phase = 'cards' | 'loading'
 
 interface NetworkSelectProps {
   onBack?: () => void
   onNext?: (selectedId: NetworkId) => void
-  /** Llamado al pulsar Continue en la pantalla de éxito (cuenta conectada). Navega a Creators search. */
   onContinueToCreatorSearch?: () => void
 }
 
@@ -48,44 +47,28 @@ export function NetworkSelect({ onBack, onNext, onContinueToCreatorSearch }: Net
 
   useEffect(() => {
     if (phase !== 'loading') return
-    const t = setTimeout(() => setPhase('success'), LOADING_MS)
+    const networkIdToAdd = pendingAuthNetworkId
+    const t = setTimeout(() => {
+      if (networkIdToAdd) setConnectedIds((prev) => new Set(prev).add(networkIdToAdd))
+      setPendingAuthNetworkId(null)
+      setPhase('cards')
+      onContinueToCreatorSearch?.()
+    }, LOADING_MS)
     return () => clearTimeout(t)
-  }, [phase])
-
-  const handleSuccessContinue = () => {
-    if (pendingAuthNetworkId) {
-      setConnectedIds((prev) => new Set(prev).add(pendingAuthNetworkId))
-    }
-    setPendingAuthNetworkId(null)
-    setPhase('cards')
-    onContinueToCreatorSearch?.()
-  }
-
-  const handleSuccessBack = () => {
-    setPendingAuthNetworkId(null)
-    setPhase('cards')
-  }
-
-  const pendingNetwork = pendingAuthNetworkId
-    ? networks.find((n) => n.id === pendingAuthNetworkId)
-    : null
+  }, [phase, pendingAuthNetworkId, onContinueToCreatorSearch])
 
   if (phase === 'loading') {
     return (
-      <div className="flex-1 flex flex-col min-w-0 overflow-auto">
+      <div className="flex-1 flex flex-col min-w-0 overflow-auto w-full">
         <div
           className="flex-shrink-0 flex flex-wrap items-center justify-between gap-4 px-6 pt-6 pb-4"
           style={{ background: 'var(--surface-page)' }}
         >
           <div className="flex items-center gap-3 min-w-0">
-            <Button
-              onPress={onBack}
-              className="titan-sidebar-icon-btn shrink-0"
-              aria-label="Back"
-            >
+            <TitanIconButton variant="ghost" aria-label="Back" onPress={onBack}>
               <ArrowLeft className="w-5 h-5" strokeWidth={1.5} />
-            </Button>
-            <h1 className="text-2xl font-semibold truncate" style={{ color: 'var(--copy-primary)' }}>
+            </TitanIconButton>
+            <h1 className="text-2xl font-semibold truncate m-0" style={{ color: 'var(--copy-primary)' }}>
               Select network
             </h1>
           </div>
@@ -103,7 +86,7 @@ export function NetworkSelect({ onBack, onNext, onContinueToCreatorSearch }: Net
             height={120}
             className="w-[120px] h-[120px] object-contain"
           />
-          <p className="text-sm" style={{ color: 'var(--copy-secondary)' }}>
+          <p className="text-sm m-0" style={{ color: 'var(--copy-secondary)' }}>
             Loading....
           </p>
         </div>
@@ -111,77 +94,32 @@ export function NetworkSelect({ onBack, onNext, onContinueToCreatorSearch }: Net
     )
   }
 
-  if (phase === 'success' && pendingNetwork) {
-    return (
-      <div className="flex-1 flex flex-col min-w-0 overflow-auto">
-        <div
-          className="flex-1 flex flex-col items-center justify-center px-6 py-12 text-center max-w-md mx-auto"
-          style={{ background: 'var(--surface-page)' }}
-        >
-          <div
-            className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
-            style={{ background: 'var(--color-teal-100)' }}
-            aria-hidden
-          >
-            <CheckCircle
-              className="w-10 h-10"
-              style={{ color: 'var(--color-teal-600)' }}
-              strokeWidth={1.5}
-            />
-          </div>
-          <h2 className="text-xl font-semibold" style={{ color: 'var(--copy-primary)' }}>
-            Account connected!
-          </h2>
-          <p className="mt-2 text-sm" style={{ color: 'var(--copy-secondary)' }}>
-            Your {pendingNetwork.name} account is now linked.
-          </p>
-          <Button
-            onPress={handleSuccessContinue}
-            className="titan-btn-primary mt-6 inline-flex items-center gap-2"
-          >
-            Continue
-            <ArrowRight className="w-4 h-4" strokeWidth={1.5} />
-          </Button>
-          <Button
-            onPress={handleSuccessBack}
-            className="titan-btn-tertiary mt-3 text-sm"
-          >
-            ← Back
-          </Button>
-        </div>
-      </div>
-    )
-  }
-
   return (
-    <div className="flex-1 flex flex-col min-w-0 overflow-auto">
+    <div className="flex-1 flex flex-col min-w-0 overflow-auto w-full">
       <div
         className="flex-shrink-0 flex flex-wrap items-center justify-between gap-4 px-6 pt-6 pb-4"
         style={{ background: 'var(--surface-page)' }}
       >
         <div className="flex items-center gap-3 min-w-0">
-          <Button
-            onPress={onBack}
-            className="titan-sidebar-icon-btn shrink-0"
-            aria-label="Back"
-          >
+          <TitanIconButton variant="ghost" aria-label="Back" onPress={onBack}>
             <ArrowLeft className="w-5 h-5" strokeWidth={1.5} />
-          </Button>
-          <h1 className="text-2xl font-semibold truncate" style={{ color: 'var(--copy-primary)' }}>
+          </TitanIconButton>
+          <h1 className="text-2xl font-semibold truncate m-0" style={{ color: 'var(--copy-primary)' }}>
             Select network
           </h1>
         </div>
-        <Button
+        <TitanButton
+          variant="primary"
           onPress={handleNext}
           isDisabled={!hasSelection}
-          className="titan-btn-primary shrink-0 inline-flex items-center gap-2"
+          className="inline-flex items-center gap-2"
         >
           Next
-          <ArrowRight className="w-4 h-4" strokeWidth={1.5} />
-        </Button>
+          <ArrowRight className="w-4 h-4 shrink-0" strokeWidth={1.5} />
+        </TitanButton>
       </div>
-      <div className="flex-1 px-6 py-6" style={{ background: 'var(--surface-page)' }}>
-        <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="flex-1 px-6 py-6 min-w-0" style={{ background: 'var(--surface-page)' }}>
+        <div className="w-full max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {networks.map((network) => (
             <NetworkCard
               key={network.id}

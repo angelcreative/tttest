@@ -7,6 +7,7 @@ fetch('http://127.0.0.1:7245/ingest/29b78a1c-be03-4dcd-8341-0fd068b1fb76', { met
 
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import 'titan-compositions/styles'
 import './index.css'
 import './audiense-brown-override.css'
 import App from './App'

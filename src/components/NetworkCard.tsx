@@ -1,5 +1,5 @@
-import { Button } from 'react-aria-components'
 import { Check } from 'lucide-react'
+import { TitanButton, TitanTag } from 'titan-compositions'
 import type { Network } from '../data/networks'
 import { TikTokLogo } from './TikTokLogo'
 
@@ -28,22 +28,15 @@ function NetworkLogo({ id }: { id: string }) {
   }
   if (id === 'instagram') {
     return (
-      <svg viewBox="0 0 24 24" className="w-10 h-10">
-        <defs>
-          <linearGradient id="ig" x1="0%" y1="100%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#fd5" />
-            <stop offset="50%" stopColor="#ff543e" />
-            <stop offset="100%" stopColor="#c837ab" />
-          </linearGradient>
-        </defs>
-        <path fill="url(#ig)" d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+      <svg viewBox="0 0 24 24" className="w-10 h-10" style={{ color: 'var(--copy-primary)' }}>
+        <path fill="currentColor" d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
       </svg>
     )
   }
   if (id === 'facebook') {
     return (
-      <svg viewBox="0 0 24 24" className="w-10 h-10" fill="#1877F2">
-        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+      <svg viewBox="0 0 24 24" className="w-10 h-10" style={{ color: 'var(--copy-primary)' }}>
+        <path fill="currentColor" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
       </svg>
     )
   }
@@ -52,28 +45,35 @@ function NetworkLogo({ id }: { id: string }) {
 
 export function NetworkCard({ network, selected, onSelect, authenticated, onConnect, onDisconnect }: NetworkCardProps) {
   return (
-    <Button
-      onPress={onSelect}
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={onSelect}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          onSelect()
+        }
+      }}
       className={`network-card relative w-full text-left rounded-xl border p-6 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring-color)] focus-visible:ring-offset-2 ${selected ? 'network-card--selected' : ''}`}
       style={{
         borderWidth: '1px',
-        borderColor: 'var(--border)',
-        ...(selected ? { background: 'var(--color-teal-100)' } : {}),
-        boxShadow: '0 1px 3px 0 rgba(0,0,0,0.06)',
+        borderColor: 'var(--divider)',
+        ...(selected ? { background: 'var(--tab-selected-background)' } : {}),
+        boxShadow: 'var(--elevation-shadow-s, none)',
       }}
     >
-      {/* Checkbox solo si la red está autenticada */}
+      {/* Titan-compliant checkbox indicator (same as MethodCard): .checkbox-root + .checkbox-box + .checkbox-mark */}
       {authenticated && (
-        <span
-          className="absolute top-4 right-4 w-6 h-6 rounded flex items-center justify-center border-2 pointer-events-none"
-          style={{
-            background: selected ? 'var(--button-primary)' : 'var(--surface-0)',
-            borderColor: selected ? 'var(--button-primary)' : 'var(--input-border)',
-          }}
+        <div
+          className="checkbox-root absolute top-4 right-4 pointer-events-none flex items-center justify-center"
+          data-selected={selected ? true : undefined}
           aria-hidden
         >
-          {selected && <Check className="w-4 h-4 text-white" strokeWidth={3} />}
-        </span>
+          <span className="checkbox-box">
+            <Check className="checkbox-mark" strokeWidth={3} />
+          </span>
+        </div>
       )}
 
       <div className="flex flex-col gap-3 items-start">
@@ -84,26 +84,17 @@ export function NetworkCard({ network, selected, onSelect, authenticated, onConn
           </p>
           {authenticated ? (
             <>
-              <span
-                className="inline-block mt-1.5 px-2 py-0.5 rounded-full text-xs font-medium"
-                style={{
-                  background: 'var(--color-teal-100)',
-                  color: 'var(--color-teal-700)',
-                }}
-              >
-                Authenticated
+              <span className="mt-1.5 inline-block">
+                <TitanTag label="Authenticated" tone="teal" />
               </span>
               <p className="text-sm mt-1.5" style={{ color: 'var(--copy-tertiary)' }}>
                 {network.subtitle}
               </p>
               {onDisconnect && (
                 <div className="mt-4 flex flex-col gap-1.5 w-full" onClick={(e) => e.stopPropagation()}>
-                  <Button
-                    onPress={onDisconnect}
-                    className="titan-btn-tertiary w-fit text-sm py-1.5 px-0"
-                  >
+                  <TitanButton variant="tertiary" onPress={onDisconnect} className="w-fit">
                     Revoke access
-                  </Button>
+                  </TitanButton>
                   <p
                     className="text-xs"
                     style={{
@@ -123,12 +114,9 @@ export function NetworkCard({ network, selected, onSelect, authenticated, onConn
                 {network.subtitle}
               </p>
               {onConnect && (
-                <Button
-                  onPress={onConnect}
-                  className="titan-btn-secondary w-fit text-sm py-1.5 px-3 mt-4"
-                >
+                <TitanButton variant="secondary" onPress={onConnect} className="w-fit mt-4">
                   Authenticate account
-                </Button>
+                </TitanButton>
               )}
               <p
                 className="text-xs"
@@ -144,6 +132,6 @@ export function NetworkCard({ network, selected, onSelect, authenticated, onConn
           )}
         </div>
       </div>
-    </Button>
+    </div>
   )
 }

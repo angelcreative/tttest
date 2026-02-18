@@ -1,11 +1,13 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
-import { Button, MenuTrigger, Menu, MenuItem, Popover, RadioGroup, Radio, SelectionIndicator } from 'react-aria-components'
-import { ArrowLeft, Plus, X, User, Globe, TrendingUp, ChevronRight, ChevronDown, Check, ChevronLeft, Pencil, Bookmark, FolderOpen, MoreVertical } from 'lucide-react'
+import { Button, MenuTrigger, Menu, MenuItem, Popover, SubmenuTrigger, RadioGroup, Radio, Checkbox, Select, Label as SelectLabel, SelectValue, ListBox, ListBoxItem } from 'react-aria-components'
+import { ArrowLeft, Plus, X, User, Globe, TrendingUp, ChevronRight, ChevronDown, Check, Pencil, Bookmark, FolderOpen, MoreVertical, Search } from 'lucide-react'
+import { TitanButton, TitanIconButton, TitanInputField, TitanPagination, TitanTag, TitanTextareaField } from 'titan-compositions'
 import { getCreatorSearchResults } from '../data/creatorSearch'
 import type { CreatorCard as CreatorCardType, CreatorFilterState } from '../data/creatorSearch'
 import type { SavedSearch, SavedSearchPayload } from '../data/savedSearches'
 import { SAVED_SEARCHES_SEED } from '../data/savedSearches'
-import { usePexelsVideosLoadMore } from '../hooks/usePexelsVideos'
+import { usePexelsVideosLoadMore, type PexelsVideoEntry } from '../hooks/usePexelsVideos'
+import { ConnectedAccountBox } from './ConnectedAccountBox'
 
 const PAGE_SIZE = 24
 
@@ -76,15 +78,28 @@ function CreatorCard({
   onSeeInsights: () => void
 }) {
   return (
-    <article
-      className={`network-card flex flex-col h-full overflow-hidden transition-colors border rounded-xl ${checked ? 'network-card--selected' : ''}`}
+    <Button
+      onPress={onToggle}
+      className={`network-card relative flex flex-col h-full overflow-hidden text-left rounded-xl border p-0 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring-color)] focus-visible:ring-offset-2 ${checked ? 'network-card--selected' : ''}`}
       style={{
         borderWidth: '1px',
-        borderColor: 'var(--border)',
-        ...(checked ? { background: 'var(--color-teal-100)' } : { background: 'var(--card-background)', boxShadow: 'var(--card-shadow)' }),
+        borderColor: 'var(--divider)',
+        ...(checked ? { background: 'var(--tab-selected-background)' } : {}),
+        boxShadow: 'var(--elevation-shadow-s, none)',
       }}
     >
-      <div className="p-4 flex gap-3 flex-nowrap min-w-0 relative">
+      {/* Titan-compliant checkbox indicator (same as MethodCard/NetworkCard) */}
+      <div
+        className="checkbox-root absolute top-4 right-4 pointer-events-none flex items-center justify-center z-10"
+        data-selected={checked ? true : undefined}
+        aria-hidden
+      >
+        <span className="checkbox-box">
+          <Check className="checkbox-mark" strokeWidth={3} />
+        </span>
+      </div>
+
+      <div className="p-4 flex gap-3 flex-nowrap min-w-0">
         <img
           src={creator.avatarUrl}
           alt=""
@@ -95,60 +110,54 @@ function CreatorCard({
           }}
         />
         <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-2">
-            <div className="min-w-0">
-              <p className="font-semibold truncate text-sm" style={{ color: 'var(--text-body)' }}>{creator.userName}</p>
-              <p className="text-sm truncate" style={{ color: 'var(--text-muted)' }}>{creator.handle}</p>
-              <p className="text-xs truncate" style={{ color: 'var(--text-muted)' }}>{creator.location}</p>
-            </div>
-            <button
-              type="button"
-              onClick={onToggle}
-              className="flex-shrink-0 w-6 h-6 rounded flex items-center justify-center transition-colors border-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
-              style={{
-                background: checked ? 'var(--button-primary)' : 'var(--surface-0)',
-                borderColor: checked ? 'var(--button-primary)' : 'var(--input-border)',
-              }}
-              aria-label={checked ? 'Deselect creator' : 'Select creator'}
-            >
-              {checked && <Check className="w-4 h-4 text-white" strokeWidth={3} />}
-            </button>
-          </div>
+          <p className="font-semibold truncate text-sm m-0" style={{ color: 'var(--copy-primary)' }}>{creator.userName}</p>
+          <p className="text-sm truncate m-0 mt-0.5" style={{ color: 'var(--copy-tertiary)' }}>{creator.handle}</p>
+          <p className="text-xs truncate m-0 mt-0.5" style={{ color: 'var(--copy-tertiary)' }}>{creator.location}</p>
         </div>
       </div>
       <div className="px-4 grid grid-cols-3 gap-2 text-center">
         <div>
-          <p className="text-lg font-semibold" style={{ color: 'var(--text-body)' }}>{creator.followers}</p>
-          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Followers</p>
+          <p className="text-lg font-semibold m-0" style={{ color: 'var(--copy-primary)' }}>{creator.followers}</p>
+          <p className="text-xs m-0" style={{ color: 'var(--copy-tertiary)' }}>Followers</p>
         </div>
         <div>
-          <p className="text-lg font-semibold" style={{ color: 'var(--text-body)' }}>{creator.engagement}</p>
-          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Engagement</p>
+          <p className="text-lg font-semibold m-0" style={{ color: 'var(--copy-primary)' }}>{creator.engagement}</p>
+          <p className="text-xs m-0" style={{ color: 'var(--copy-tertiary)' }}>Engagement</p>
         </div>
         <div>
-          <p className="text-lg font-semibold" style={{ color: 'var(--text-body)' }}>{creator.likes}</p>
-          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Likes</p>
+          <p className="text-lg font-semibold m-0" style={{ color: 'var(--copy-primary)' }}>{creator.likes}</p>
+          <p className="text-xs m-0" style={{ color: 'var(--copy-tertiary)' }}>Likes</p>
         </div>
       </div>
-      <div className="px-4 pb-4 pt-4 flex justify-end">
-        <button
-          type="button"
-          onClick={onSeeInsights}
-          className="inline-flex items-center gap-1 text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 rounded"
-          style={{ color: 'var(--text-link)' }}
-        >
+      <div className="px-4 pb-4 pt-4 flex justify-end" onClick={(e) => e.stopPropagation()}>
+        <TitanButton variant="tertiary" onPress={onSeeInsights} className="inline-flex items-center gap-1 text-sm">
           See profile insights
-          <ChevronRight className="w-4 h-4" strokeWidth={1.5} />
-        </button>
+          <ChevronRight className="w-4 h-4 flex-shrink-0" />
+        </TitanButton>
       </div>
-    </article>
+    </Button>
   )
 }
 
-/** Grid de vídeos Pexels para el modal de detalle del creador. Reproduce en el mismo espacio y permite cargar más. */
-function CreatorDetailVideos({ query = 'lifestyle' }: { query?: string }) {
+/** Grid de vídeos Pexels (presentacional). Recibe estado para poder poner Load more en footer del dialog. */
+function CreatorDetailVideosContent({
+  videos,
+  loading,
+  error,
+  loadMore,
+  loadingMore,
+  hasMore,
+  hideLoadMoreInBody = false,
+}: {
+  videos: PexelsVideoEntry[]
+  loading: boolean
+  error: string | null
+  loadMore: () => void
+  loadingMore: boolean
+  hasMore: boolean
+  hideLoadMoreInBody?: boolean
+}) {
   const [playingUrl, setPlayingUrl] = useState<string | null>(null)
-  const { videos, loading, error, loadMore, loadingMore, hasMore } = usePexelsVideosLoadMore(query)
 
   if (loading) {
     return (
@@ -161,7 +170,7 @@ function CreatorDetailVideos({ query = 'lifestyle' }: { query?: string }) {
   }
   if (error || videos.length === 0) {
     return (
-      <p className="text-sm py-4" style={{ color: 'var(--text-muted)' }}>
+      <p className="text-sm py-4 m-0" style={{ color: 'var(--copy-tertiary)' }}>
         {error ?? 'No videos available.'}
       </p>
     )
@@ -169,16 +178,12 @@ function CreatorDetailVideos({ query = 'lifestyle' }: { query?: string }) {
   return (
     <div className="space-y-4">
       {playingUrl && (
-        <div className="rounded-lg overflow-hidden border bg-black" style={{ borderColor: 'var(--divider)' }}>
+        <div className="rounded-lg overflow-hidden border" style={{ borderColor: 'var(--divider)', background: 'var(--surface-0)' }}>
           <video src={playingUrl} controls autoPlay className="w-full aspect-video" />
           <div className="p-2 flex justify-end">
-            <Button
-              onPress={() => setPlayingUrl(null)}
-              className="text-sm px-3 py-1.5 rounded-md"
-              style={{ background: 'var(--button-secondary)', color: 'var(--button-secondary-text)' }}
-            >
+            <TitanButton variant="secondary" onPress={() => setPlayingUrl(null)}>
               Close video
-            </Button>
+            </TitanButton>
           </div>
         </div>
       )}
@@ -188,32 +193,109 @@ function CreatorDetailVideos({ query = 'lifestyle' }: { query?: string }) {
             key={i}
             type="button"
             onClick={() => setPlayingUrl(v.videoUrl)}
-            className="relative aspect-video rounded-lg overflow-hidden border border-[var(--divider)] group text-left w-full"
+            className="relative aspect-video rounded-lg overflow-hidden border cursor-pointer group text-left w-full"
+            style={{ borderColor: 'var(--divider)' }}
           >
             <img src={v.thumbnailUrl} alt="" className="w-full h-full object-cover" />
-            <span className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity">
-              <span className="w-12 h-12 rounded-full flex items-center justify-center bg-white/90">
+            <span className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity" style={{ background: 'var(--overlay-backdrop)' }}>
+              <span className="w-12 h-12 rounded-full flex items-center justify-center" style={{ background: 'var(--surface-0)' }}>
                 <ChevronRight className="w-6 h-6 ml-0.5" style={{ color: 'var(--copy-primary)' }} strokeWidth={2} />
               </span>
             </span>
-            <span className="absolute top-2 right-2 p-1 rounded bg-black/50">
-              <MoreVertical className="w-4 h-4 text-white" strokeWidth={1.5} />
+            <span className="absolute top-2 right-2 p-1 rounded" style={{ background: 'var(--surface-0)' }}>
+              <MoreVertical className="w-4 h-4" style={{ color: 'var(--copy-primary)' }} strokeWidth={1.5} />
             </span>
           </button>
         ))}
       </div>
-      {hasMore && (
+      {!hideLoadMoreInBody && hasMore && (
         <div className="flex justify-center pt-2">
-          <Button
-            onPress={loadMore}
-            isDisabled={loadingMore}
-            className="px-4 py-2 rounded-lg text-sm font-medium"
-            style={{ background: 'var(--button-secondary)', color: 'var(--button-secondary-text)' }}
-          >
+          <TitanButton variant="secondary" onPress={loadMore} isDisabled={loadingMore}>
             {loadingMore ? 'Cargando…' : 'Load more'}
-          </Button>
+          </TitanButton>
         </div>
       )}
+    </div>
+  )
+}
+
+/** Dialog Titan: Creator insights. Sin X en header; footer con Close (secondary) y Load more (primary). */
+function CreatorInsightsDialog({
+  creator,
+  onClose,
+}: {
+  creator: CreatorCardType
+  onClose: () => void
+}) {
+  const { videos, loading, error, loadMore, loadingMore, hasMore } = usePexelsVideosLoadMore('lifestyle')
+
+  return (
+    <div
+      className="dialog-overlay fixed inset-0 z-50"
+      aria-hidden
+      onClick={onClose}
+    >
+      <div
+        className="dialog-modal"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div
+          className="dialog-panel flex flex-col max-h-[90vh] overflow-hidden"
+        >
+          <header className="dialog-header flex-shrink-0 text-left">
+            <h2 className="dialog-title">Creator insights</h2>
+          </header>
+          <div className="dialog-body flex-1 overflow-auto text-left min-h-0 space-y-6">
+            <div className="rounded-xl border p-4 flex gap-4" style={{ borderColor: 'var(--divider)', background: 'var(--surface-0)' }}>
+              <img
+                src={creator.avatarUrl}
+                alt=""
+                className="w-14 h-14 rounded-full object-cover flex-shrink-0"
+                style={{ background: 'var(--surface-1)' }}
+              />
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-base m-0" style={{ color: 'var(--copy-primary)' }}>{creator.userName}</p>
+                <p className="text-sm m-0 mt-0.5" style={{ color: 'var(--copy-tertiary)' }}>{creator.handle}</p>
+                <p className="text-sm m-0 mt-0.5" style={{ color: 'var(--copy-tertiary)' }}>{creator.location}</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div>
+                <p className="text-lg font-semibold m-0" style={{ color: 'var(--copy-primary)' }}>{creator.followers}</p>
+                <p className="text-xs m-0" style={{ color: 'var(--copy-tertiary)' }}>Followers</p>
+              </div>
+              <div>
+                <p className="text-lg font-semibold m-0" style={{ color: 'var(--copy-primary)' }}>{creator.engagement}</p>
+                <p className="text-xs m-0" style={{ color: 'var(--copy-tertiary)' }}>Engagement</p>
+              </div>
+              <div>
+                <p className="text-lg font-semibold m-0" style={{ color: 'var(--copy-primary)' }}>{creator.likes}</p>
+                <p className="text-xs m-0" style={{ color: 'var(--copy-tertiary)' }}>Likes</p>
+              </div>
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold mb-3 m-0" style={{ color: 'var(--copy-primary)' }}>Videos</h3>
+              <CreatorDetailVideosContent
+                videos={videos}
+                loading={loading}
+                error={error}
+                loadMore={loadMore}
+                loadingMore={loadingMore}
+                hasMore={hasMore}
+                hideLoadMoreInBody
+              />
+            </div>
+          </div>
+          <footer className="dialog-footer flex-shrink-0 pt-4">
+            <TitanButton variant="secondary" onPress={onClose}>
+              Close
+            </TitanButton>
+            <TitanButton variant="primary" onPress={loadMore} isDisabled={!hasMore || loadingMore}>
+              {loadingMore ? 'Loading…' : 'Load more'}
+            </TitanButton>
+          </footer>
+        </div>
+      </div>
     </div>
   )
 }
@@ -333,8 +415,6 @@ const LANGUAGES = [
 ]
 
 export function CreatorSearch({ onBack }: CreatorSearchProps) {
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [expandedId, setExpandedId] = useState<string | null>(null)
   const [selectedCreatorIds, setSelectedCreatorIds] = useState<Set<string>>(new Set())
   const [isResultsLoading, setIsResultsLoading] = useState(false)
   const [drawer, setDrawer] = useState<null | 'new' | 'existing'>(null)
@@ -387,8 +467,6 @@ export function CreatorSearch({ onBack }: CreatorSearchProps) {
   const [saveSearchConfirmed, setSaveSearchConfirmed] = useState(false)
   const [loadSearchOpen, setLoadSearchOpen] = useState(false)
   const [savedSearches, setSavedSearches] = useState<SavedSearch[]>(SAVED_SEARCHES_SEED)
-  const menuRef = useRef<HTMLDivElement>(null)
-  const fabRef = useRef<HTMLButtonElement>(null)
 
   const filterState = useMemo<CreatorFilterState>(
     () => ({
@@ -468,6 +546,12 @@ export function CreatorSearch({ onBack }: CreatorSearchProps) {
 
   const [currentPage, setCurrentPage] = useState(1)
   const totalPages = Math.max(1, Math.ceil(creatorResults.length / PAGE_SIZE))
+  const paginationPages = useMemo((): (number | 'ellipsis')[] => {
+    if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1)
+    if (currentPage <= 4) return [1, 2, 3, 4, 5, 'ellipsis', totalPages]
+    if (currentPage >= totalPages - 3) return [1, 'ellipsis', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages]
+    return [1, 'ellipsis', currentPage - 1, currentPage, currentPage + 1, 'ellipsis', totalPages]
+  }, [totalPages, currentPage])
   const paginatedResults = useMemo(
     () =>
       creatorResults.slice(
@@ -589,22 +673,6 @@ export function CreatorSearch({ onBack }: CreatorSearchProps) {
     return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`
   }
 
-  useEffect(() => {
-    if (!menuOpen) return
-    const handleClickOutside = (e: MouseEvent) => {
-      if (
-        menuRef.current &&
-        !menuRef.current.contains(e.target as Node) &&
-        fabRef.current &&
-        !fabRef.current.contains(e.target as Node)
-      ) {
-        setMenuOpen(false)
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [menuOpen])
-
   const openFilterDrawer = (title: string) => {
     if (title === 'Keyword search') setKeywordChips([...appliedKeywordChips])
     else if (title === 'Follower country' || title === 'Countries') setSelectedCountries(new Set(appliedCountries))
@@ -620,7 +688,6 @@ export function CreatorSearch({ onBack }: CreatorSearchProps) {
     else if (title === 'Median views') setSelectedMedianViewsRanges(new Set(appliedMedianViewsRanges))
     else if (title === 'Engagement rate') setSelectedEngagementRateRanges(new Set(appliedEngagementRateRanges))
     setFilterDrawer(title)
-    setMenuOpen(false)
   }
 
   const closeFilterDrawer = () => {
@@ -658,173 +725,153 @@ export function CreatorSearch({ onBack }: CreatorSearchProps) {
         style={{ background: 'var(--surface-page)' }}
       >
         <div className="flex items-center gap-3 min-w-0">
-          <Button onPress={onBack} className="titan-sidebar-icon-btn shrink-0" aria-label="Back">
-            <ArrowLeft className="w-5 h-5" strokeWidth={1.5} />
-          </Button>
+          <TitanIconButton variant="ghost" aria-label="Back" onPress={onBack} className="shrink-0">
+            <ArrowLeft />
+          </TitanIconButton>
           <h1 className="text-2xl font-semibold truncate" style={{ color: 'var(--copy-primary)' }}>
             Campaign collab
           </h1>
-          <MenuTrigger>
-            <Button
-              aria-label="Ads account"
-              className="titan-btn-secondary ml-2 min-w-0 max-w-[180px] inline-flex items-center gap-2"
-            >
-              {adsAccountId === '6' ? 'Ads Account 6' : adsAccountId === '1' ? 'Ads Account 1' : 'Ads Account 2'}
-              <ChevronDown className="w-4 h-4 flex-shrink-0" strokeWidth={1.5} />
-            </Button>
-            <Popover className="titan-menu" placement="bottom start" offset={4}>
-              <Menu
-                className="min-w-[180px] p-0 outline-none bg-transparent border-0 shadow-none"
-                onAction={(key) => setAdsAccountId(String(key))}
+          <div className="ml-2 min-w-0 max-w-[180px]">
+            <MenuTrigger>
+              <TitanButton
+                variant="secondary"
+                aria-label="Ads account"
+                className="min-w-0 w-full justify-between"
               >
-                <MenuItem id="6" className="titan-menu-item">Ads Account 6</MenuItem>
-                <MenuItem id="1" className="titan-menu-item">Ads Account 1</MenuItem>
-                <MenuItem id="2" className="titan-menu-item">Ads Account 2</MenuItem>
-              </Menu>
-            </Popover>
-          </MenuTrigger>
+                <span className="truncate">{adsAccountId === '6' ? 'Ads Account 6' : adsAccountId === '1' ? 'Ads Account 1' : 'Ads Account 2'}</span>
+                <ChevronDown className="w-4 h-4 flex-shrink-0" />
+              </TitanButton>
+              <Popover className="menu-popover" placement="bottom start" offset={4}>
+                <Menu className="menu-list" onAction={(key) => setAdsAccountId(String(key))}>
+                  <MenuItem id="6" className="menu-item" textValue="Ads Account 6">Ads Account 6</MenuItem>
+                  <MenuItem id="1" className="menu-item" textValue="Ads Account 1">Ads Account 1</MenuItem>
+                  <MenuItem id="2" className="menu-item" textValue="Ads Account 2">Ads Account 2</MenuItem>
+                </Menu>
+              </Popover>
+            </MenuTrigger>
+          </div>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           <span className="text-sm px-2" style={{ color: 'var(--copy-secondary)' }}>
             {selectedCreatorIds.size} selected
           </span>
-          <Button
+          <TitanButton
+            variant="secondary"
+            icon={<Bookmark />}
             onPress={() => {
               setSaveSearchOpen(true)
               setSaveSearchConfirmed(false)
               setSaveSearchName('')
             }}
-            className="titan-btn-secondary inline-flex items-center gap-2"
           >
-            <Bookmark className="w-4 h-4" strokeWidth={1.5} />
             Save search
-          </Button>
-          <Button onPress={() => setLoadSearchOpen(true)} className="titan-btn-secondary inline-flex items-center gap-2">
-            <FolderOpen className="w-4 h-4" strokeWidth={1.5} />
+          </TitanButton>
+          <TitanButton variant="secondary" icon={<FolderOpen />} onPress={() => setLoadSearchOpen(true)}>
             Load search
-          </Button>
+          </TitanButton>
           <MenuTrigger>
-            <Button
+            <TitanButton
+              variant="primary"
               isDisabled={creatorResults.length === 0}
-              className="titan-btn-primary inline-flex items-center gap-2"
               aria-label="Add to campaign"
+              className="inline-flex items-center gap-2"
             >
               Add to campaign
-              <ChevronDown className="w-4 h-4" strokeWidth={1.5} />
-            </Button>
-            <Popover
-              className="titan-popover w-56 rounded-xl py-1"
-              style={{
-                background: 'var(--surface-1, #ffffff)',
-                border: '1px solid var(--divider)',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.12)',
-              }}
-            >
+              <ChevronDown className="w-4 h-4 flex-shrink-0" />
+            </TitanButton>
+            <Popover className="menu-popover" placement="bottom end" offset={4}>
               <Menu
-                className="outline-none"
+                className="menu-list"
                 onAction={(key) => {
                   if (key === 'new') setDrawer('new')
                   else if (key === 'existing') setDrawer('existing')
                 }}
               >
-                <MenuItem id="new" className="titan-menu-item">New campaign</MenuItem>
-                <MenuItem id="existing" className="titan-menu-item">Add to existing campaign</MenuItem>
+                <MenuItem id="new" className="menu-item" textValue="New campaign">
+                  New campaign
+                </MenuItem>
+                <MenuItem id="existing" className="menu-item" textValue="Add to existing campaign">
+                  Add to existing campaign
+                </MenuItem>
               </Menu>
             </Popover>
           </MenuTrigger>
         </div>
       </div>
 
-      {/* Bloque Connected Account entre título y FAB */}
-      <div
-        className="flex-shrink-0 mx-6 mb-4 flex items-center gap-4 rounded-xl border px-4 py-3"
-        style={{
-          background: 'var(--surface-1)',
-          borderColor: 'var(--divider)',
-        }}
-      >
-        <div
-          className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full"
-          style={{ background: 'var(--color-black-100)' }}
-        >
-          <User className="h-5 w-5" style={{ color: 'var(--copy-secondary)' }} strokeWidth={1.5} />
-        </div>
-        <div className="min-w-0">
-          <p className="text-xs font-medium" style={{ color: 'var(--copy-tertiary)' }}>Connected Account:</p>
-          <p className="truncate text-sm font-semibold" style={{ color: 'var(--copy-primary)' }}>@adidas</p>
-        </div>
+      {/* Connected Account — componente Titan */}
+      <div className="flex-shrink-0 mx-6 mb-4">
+        <ConnectedAccountBox />
       </div>
 
-      {/* Fila: columna FAB fija 72px + contenido fijo (el menú abre en overlay, no desplaza nada) */}
+      {/* Fila: columna FAB fija 72px + contenido (menú en cascada Titan compliant) */}
       <div className="flex-1 flex min-h-0 min-w-0 px-6 pb-6 overflow-hidden w-full">
-        <div ref={menuRef} className="flex-shrink-0 w-[72px] min-w-[72px] pt-4 relative" onMouseLeave={() => setExpandedId(null)}>
-          <button
-            ref={fabRef}
-            type="button"
-            onClick={() => setMenuOpen((o) => !o)}
-            className="relative w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 flex-shrink-0"
-            style={{ background: 'var(--button-primary)' }}
-            aria-label={menuOpen ? 'Close filters' : 'Open search criteria'}
-            aria-expanded={menuOpen}
-            title={menuOpen ? 'Close' : 'Search criteria'}
-          >
-            {menuOpen ? (
-              <X className="w-7 h-7" strokeWidth={1.5} style={{ color: 'var(--color-white-900)' }} />
-            ) : (
-              <Plus className="w-7 h-7" strokeWidth={1.5} style={{ color: 'var(--color-white-900)' }} />
-            )}
-            {activeFilters.length > 0 && (
-              <span
-                className="absolute -top-0.5 -right-0.5 min-w-[1.25rem] h-5 px-1 rounded-full flex items-center justify-center text-xs font-semibold"
-                style={{ background: 'var(--button-primary)', color: 'var(--button-primary-label)', border: '2px solid var(--surface-page)' }}
+        <div className="flex-shrink-0 w-[72px] min-w-[72px] pt-4 relative">
+          <MenuTrigger>
+            <Button
+              className="fab-primary relative flex-shrink-0"
+              aria-label="Open search criteria"
+            >
+              <Plus />
+              {activeFilters.length > 0 && (
+                <span
+                  className="absolute -top-0.5 -right-0.5 min-w-[1.25rem] h-5 px-1 rounded-full flex items-center justify-center text-xs font-semibold"
+                  style={{
+                    background: 'var(--button-primary-slot-bg)',
+                    color: 'var(--button-primary-slot-label)',
+                    border: '2px solid var(--surface-page)',
+                  }}
+                >
+                  {activeFilters.length}
+                </span>
+              )}
+            </Button>
+            <Popover className="menu-popover" placement="right" offset={8}>
+              <Menu
+                className="menu-list"
+                onAction={(key) => openFilterDrawer(String(key))}
+                style={{ minWidth: '18rem' }}
               >
-                {activeFilters.length}
-              </span>
-            )}
-          </button>
-          {menuOpen && (
-            <div className="absolute left-full top-0 pt-4 pl-2 flex items-start z-20">
-              <div className="titan-menu titan-popover w-72 overflow-hidden flex-shrink-0" role="menu">
                 {FAB_MENU_ITEMS.map((item) => {
-                  const isHovered = expandedId === item.id
                   const Icon = item.icon
                   return (
-                    <button
-                      key={item.id}
-                      type="button"
-                      onMouseEnter={() => setExpandedId(item.id)}
-                      className="titan-menu-item w-full flex items-center gap-3 font-medium text-sm rounded-none min-h-[40px]"
-                      style={{ background: isHovered ? 'var(--menu-item-slot-bg-hover)' : undefined }}
-                      role="menuitem"
-                    >
-                      <Icon className="w-5 h-5 flex-shrink-0" style={{ color: 'var(--menu-item-slot-icon, var(--copy-tertiary))' }} strokeWidth={1.5} />
-                      <span className="flex-1 text-left">{item.label}</span>
-                      <ChevronRight className="w-5 h-5 flex-shrink-0" style={{ color: 'var(--menu-item-slot-icon, var(--copy-tertiary))' }} strokeWidth={1.5} />
-                    </button>
+                    <SubmenuTrigger key={item.id}>
+                      <MenuItem className="menu-item" textValue={item.label}>
+                        <span className="menu-item-start">
+                          <span className="menu-item-icon" aria-hidden>
+                            <Icon />
+                          </span>
+                          <span>{item.label}</span>
+                        </span>
+                        <span className="menu-item-end" aria-hidden>
+                          <ChevronRight />
+                        </span>
+                      </MenuItem>
+                      <Popover className="menu-popover menu-popover-submenu" placement="end top">
+                        <Menu
+                          className="menu-list"
+                          onAction={(key) => openFilterDrawer(String(key))}
+                          style={{ minWidth: '14rem' }}
+                        >
+                          {item.children.map((child) => (
+                            <MenuItem
+                              key={child}
+                              id={child}
+                              className="menu-item"
+                              textValue={child}
+                              onAction={() => openFilterDrawer(child)}
+                            >
+                              {child}
+                            </MenuItem>
+                          ))}
+                        </Menu>
+                      </Popover>
+                    </SubmenuTrigger>
                   )
                 })}
-              </div>
-              {expandedId && (() => {
-                const item = FAB_MENU_ITEMS.find((i) => i.id === expandedId)
-                if (!item) return null
-                return (
-                  <div className="titan-menu titan-popover w-56 overflow-hidden flex-shrink-0 ml-2" role="menu">
-                    {item.children.map((child) => (
-                      <button
-                        key={child}
-                        type="button"
-                        onClick={() => openFilterDrawer(child)}
-                        className="titan-menu-item w-full text-left text-sm rounded-none"
-                        role="menuitem"
-                      >
-                        {child}
-                      </button>
-                    ))}
-                  </div>
-                )
-              })()}
-            </div>
-          )}
+              </Menu>
+            </Popover>
+          </MenuTrigger>
         </div>
 
         {/* Zona de contenido: ancho fijo, nunca se desplaza al abrir el menú FAB */}
@@ -869,31 +916,18 @@ export function CreatorSearch({ onBack }: CreatorSearchProps) {
                 </LazyCreatorCard>
               ))}
             </div>
-            {/* Paginación Titan */}
-            <nav
-              className="flex items-center justify-center gap-2 flex-wrap"
-              aria-label="Pagination"
-            >
-              <Button
-                onPress={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                isDisabled={currentPage === 1}
-                className="titan-btn-secondary rounded-full p-2"
-                aria-label="Previous page"
-              >
-                <ChevronLeft className="w-5 h-5" strokeWidth={1.5} />
-              </Button>
-              <span className="px-4 py-2 text-sm" style={{ color: 'var(--text-muted)' }}>
-                Page {currentPage} of {totalPages}
-              </span>
-              <Button
-                onPress={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                isDisabled={currentPage === totalPages}
-                className="titan-btn-secondary rounded-full p-2"
-                aria-label="Next page"
-              >
-                <ChevronRight className="w-5 h-5" strokeWidth={1.5} />
-              </Button>
-            </nav>
+            <div className="flex justify-center w-full">
+              <TitanPagination
+                ariaLabel="Pagination"
+                pages={paginationPages}
+                currentPage={currentPage}
+                previousDisabled={currentPage === 1}
+                nextDisabled={currentPage === totalPages}
+                onPrevious={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                onNext={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                onPageChange={(page) => setCurrentPage(page)}
+              />
+            </div>
           </>
         ) : (
           <div
@@ -910,36 +944,27 @@ export function CreatorSearch({ onBack }: CreatorSearchProps) {
         </div>
       </div>
 
-      {/* Drawer: filtros del FAB (Keyword search, etc.) — misma shell, contenido por voz */}
+      {/* Drawer: filtros del FAB — Titan compliant (drawer-overlay, drawer-panel, TitanIconButton, TitanInputField, TitanCheckbox, TitanButton) */}
       {filterDrawer !== null && (
         <div className="fixed inset-0 z-50 flex justify-end pointer-events-none">
           <div
-            className="absolute inset-0 bg-black/30 pointer-events-auto transition-opacity duration-300 ease-out"
+            className="drawer-overlay absolute inset-0 pointer-events-auto transition-opacity duration-300 ease-out"
             style={{ opacity: isFilterDrawerClosing ? 0 : 1 }}
             aria-hidden
             onClick={closeFilterDrawer}
           />
           <div
-            className="relative w-full max-w-md flex flex-col max-h-full overflow-hidden pointer-events-auto bg-[var(--surface-page)] border-l border-[var(--divider)] shadow-xl transition-transform duration-300 ease-out"
-            style={{
-              transform: isFilterDrawerClosing ? 'translateX(100%)' : 'translateX(0)',
-              boxShadow: isFilterDrawerClosing ? 'none' : 'var(--elevation-2, 0 10px 40px rgba(0,0,0,0.12))',
-            }}
+            className="drawer-modal relative flex-shrink-0 pointer-events-auto transition-transform duration-300 ease-out"
+            style={{ transform: isFilterDrawerClosing ? 'translateX(100%)' : 'translateX(0)' }}
           >
-            <div className="flex-shrink-0 flex items-center justify-between px-6 py-4">
-              <h2 className="text-xl font-semibold" style={{ color: 'var(--copy-primary)' }}>
-                {filterDrawer}
-              </h2>
-              <Button
-                onPress={closeFilterDrawer}
-                className="rounded-full p-2 transition-colors hover:opacity-80 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-                style={{ color: 'var(--copy-secondary)' }}
-                aria-label="Close"
-              >
-                <X className="w-5 h-5" strokeWidth={1.5} />
-              </Button>
-            </div>
-            <div className="flex-1 overflow-auto p-6 flex flex-col min-h-0">
+            <div className="drawer-panel flex flex-col max-h-full overflow-hidden">
+              <header className="drawer-header">
+                <h3 className="drawer-title">{filterDrawer}</h3>
+                <TitanIconButton variant="ghost" aria-label="Close drawer" onPress={closeFilterDrawer}>
+                  <X />
+                </TitanIconButton>
+              </header>
+              <div className="drawer-body flex flex-col min-h-0 p-6">
               {filterDrawer === 'Keyword search' ? (
                 <div className="space-y-5">
                   <p className="text-sm" style={{ color: 'var(--copy-secondary)' }}>
@@ -963,498 +988,394 @@ export function CreatorSearch({ onBack }: CreatorSearchProps) {
                         ))}
                       </div>
                     )}
-                    <input
-                      type="text"
+                    <TitanInputField
+                      placeholder="Type a keyword and press comma or Enter to add"
                       value={keywordInput}
-                      onChange={(e) => setKeywordInput(e.target.value)}
-                      onKeyDown={(e) => {
+                      onChange={setKeywordInput}
+                      onKeyDown={(e: React.KeyboardEvent) => {
                         if (e.key === 'Enter' || e.key === ',') {
                           e.preventDefault()
                           addKeywordChip()
                         }
                       }}
-                      placeholder="Type a keyword and press comma or Enter to add"
-                      className="w-full px-4 py-2.5 rounded-lg border text-sm outline-none transition-colors"
-                      style={{
-                        background: 'var(--input-background)',
-                        borderColor: 'var(--input-border)',
-                        color: 'var(--copy-primary)',
-                      }}
                     />
                   </div>
-                  <div className="flex justify-end gap-2 pt-4 border-t border-[var(--divider)]">
-                    <Button
-                      onPress={() => {
-                        setKeywordChips([])
-                        setKeywordInput('')
-                        closeFilterDrawer()
-                      }}
-                      className="titan-btn-secondary"
-                    >
+                  <div className="flex justify-end gap-2 pt-4 border-t" style={{ borderColor: 'var(--drawer-header-border-bottom)' }}>
+                    <TitanButton variant="secondary" onPress={() => { setKeywordChips([]); setKeywordInput(''); closeFilterDrawer() }}>
                       Cancel
-                    </Button>
-                    <Button onPress={applyFilterDrawerAndSearch} className="titan-btn-primary">
+                    </TitanButton>
+                    <TitanButton variant="primary" onPress={applyFilterDrawerAndSearch}>
                       Apply
-                    </Button>
+                    </TitanButton>
                   </div>
                 </div>
               ) : filterDrawer === 'Content categories' ? (
                 <div className="flex flex-col flex-1 min-h-0 gap-3">
-                  <input
-                    type="search"
-                    value={contentCategorySearch}
-                    onChange={(e) => setContentCategorySearch(e.target.value)}
+                  <TitanInputField
+                    label="Search"
                     placeholder="Search content categories..."
-                    className="w-full px-4 py-2.5 rounded-lg border text-sm outline-none transition-colors flex-shrink-0"
-                    style={{
-                      background: 'var(--input-background)',
-                      borderColor: 'var(--input-border)',
-                      color: 'var(--copy-primary)',
-                    }}
+                    value={contentCategorySearch}
+                    onChange={setContentCategorySearch}
+                    leadingIcon={<Search />}
                   />
-                  <div className="flex-1 min-h-0 overflow-auto border border-[var(--divider)] rounded-lg flex-shrink" style={{ background: 'var(--surface-0)' }}>
+                  <div
+                    className="flex-1 min-h-0 overflow-auto flex-shrink rounded-lg border"
+                    style={{
+                      borderColor: 'var(--input-slot-border)',
+                      background: 'var(--surface-0)',
+                    }}
+                  >
                     <ul className="py-1">
                       {CONTENT_CATEGORIES.filter((cat) =>
                         !contentCategorySearch.trim() || cat.toLowerCase().includes(contentCategorySearch.trim().toLowerCase())
                       ).map((category) => (
                         <li key={category}>
-                          <label className="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-[var(--surface-hover)] transition-colors">
-                            <input
-                              type="checkbox"
-                              checked={selectedContentCategories.has(category)}
-                              onChange={(e) => {
-                                setSelectedContentCategories((prev) => {
-                                  const next = new Set(prev)
-                                  if (e.target.checked) next.add(category)
-                                  else next.delete(category)
-                                  return next
-                                })
-                              }}
-                              className="rounded border-[var(--input-border)]"
-                              style={{ accentColor: 'var(--button-primary)' }}
-                            />
-                            <span className="text-sm" style={{ color: 'var(--copy-primary)' }}>{category}</span>
-                          </label>
+                          <Checkbox
+                            className="checkbox-root w-full cursor-pointer px-4 py-2.5 rounded-none min-h-[40px]"
+                            style={{ cursor: 'pointer' }}
+                            isSelected={selectedContentCategories.has(category)}
+                            onChange={(selected: boolean) => {
+                              setSelectedContentCategories((prev) => {
+                                const next = new Set(prev)
+                                if (selected) next.add(category)
+                                else next.delete(category)
+                                return next
+                              })
+                            }}
+                          >
+                            <span className="checkbox-box" aria-hidden>
+                              <Check className="checkbox-mark" />
+                            </span>
+                            <span className="choice-text" style={{ color: 'var(--copy-primary)' }}>{category}</span>
+                          </Checkbox>
                         </li>
                       ))}
                     </ul>
                   </div>
-                  <div className="flex justify-end gap-2 pt-4 border-t border-[var(--divider)] flex-shrink-0">
-                    <Button
-                      onPress={() => {
-                        setSelectedContentCategories(new Set())
-                        closeFilterDrawer()
-                      }}
-                      className="titan-btn-secondary"
-                    >
+                  <div className="flex justify-end gap-2 pt-4 border-t flex-shrink-0" style={{ borderColor: 'var(--drawer-header-border-bottom)' }}>
+                    <TitanButton variant="secondary" onPress={() => { setSelectedContentCategories(new Set()); closeFilterDrawer() }}>
                       Cancel
-                    </Button>
-                    <Button onPress={applyFilterDrawerAndSearch} className="titan-btn-primary">
+                    </TitanButton>
+                    <TitanButton variant="primary" onPress={applyFilterDrawerAndSearch}>
                       Apply
-                    </Button>
+                    </TitanButton>
                   </div>
                 </div>
               ) : filterDrawer === 'Industry categories' ? (
                 <div className="flex flex-col flex-1 min-h-0 gap-3">
-                  <input
-                    type="search"
-                    value={industryCategorySearch}
-                    onChange={(e) => setIndustryCategorySearch(e.target.value)}
+                  <TitanInputField
+                    label="Search"
                     placeholder="Search industry categories..."
-                    className="w-full px-4 py-2.5 rounded-lg border text-sm outline-none transition-colors flex-shrink-0"
-                    style={{
-                      background: 'var(--input-background)',
-                      borderColor: 'var(--input-border)',
-                      color: 'var(--copy-primary)',
-                    }}
+                    value={industryCategorySearch}
+                    onChange={setIndustryCategorySearch}
+                    leadingIcon={<Search />}
                   />
-                  <div className="flex-1 min-h-0 overflow-auto border border-[var(--divider)] rounded-lg flex-shrink" style={{ background: 'var(--surface-0)' }}>
+                  <div className="flex-1 min-h-0 overflow-auto flex-shrink rounded-lg border" style={{ borderColor: 'var(--input-slot-border)', background: 'var(--surface-0)' }}>
                     <ul className="py-1">
                       {INDUSTRY_CATEGORIES.filter((cat) =>
                         !industryCategorySearch.trim() || cat.toLowerCase().includes(industryCategorySearch.trim().toLowerCase())
                       ).map((category) => (
                         <li key={category}>
-                          <label className="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-[var(--surface-hover)] transition-colors">
-                            <input
-                              type="checkbox"
-                              checked={selectedIndustryCategories.has(category)}
-                              onChange={(e) => {
-                                setSelectedIndustryCategories((prev) => {
-                                  const next = new Set(prev)
-                                  if (e.target.checked) next.add(category)
-                                  else next.delete(category)
-                                  return next
-                                })
-                              }}
-                              className="rounded border-[var(--input-border)]"
-                              style={{ accentColor: 'var(--button-primary)' }}
-                            />
-                            <span className="text-sm" style={{ color: 'var(--copy-primary)' }}>{category}</span>
-                          </label>
+                          <Checkbox
+                            className="checkbox-root w-full cursor-pointer px-4 py-2.5 rounded-none min-h-[40px]"
+                            style={{ cursor: 'pointer' }}
+                            isSelected={selectedIndustryCategories.has(category)}
+                            onChange={(selected: boolean) => {
+                              setSelectedIndustryCategories((prev) => {
+                                const next = new Set(prev)
+                                if (selected) next.add(category)
+                                else next.delete(category)
+                                return next
+                              })
+                            }}
+                          >
+                            <span className="checkbox-box" aria-hidden><Check className="checkbox-mark" /></span>
+                            <span className="choice-text" style={{ color: 'var(--copy-primary)' }}>{category}</span>
+                          </Checkbox>
                         </li>
                       ))}
                     </ul>
                   </div>
-                  <div className="flex justify-end gap-2 pt-4 border-t border-[var(--divider)] flex-shrink-0">
-                    <Button
-                      onPress={() => {
-                        setSelectedIndustryCategories(new Set())
-                        closeFilterDrawer()
-                      }}
-                      className="titan-btn-secondary"
-                    >
-                      Cancel
-                    </Button>
-                    <Button onPress={applyFilterDrawerAndSearch} className="titan-btn-primary">
-                      Apply
-                    </Button>
+                  <div className="flex justify-end gap-2 pt-4 border-t flex-shrink-0" style={{ borderColor: 'var(--drawer-header-border-bottom)' }}>
+                    <TitanButton variant="secondary" onPress={() => { setSelectedIndustryCategories(new Set()); closeFilterDrawer() }}>Cancel</TitanButton>
+                    <TitanButton variant="primary" onPress={applyFilterDrawerAndSearch}>Apply</TitanButton>
                   </div>
                 </div>
               ) : filterDrawer === 'Countries' || filterDrawer === 'Follower country' ? (
                 <div className="flex flex-col flex-1 min-h-0 gap-3">
-                  <input
-                    type="search"
-                    value={countrySearch}
-                    onChange={(e) => setCountrySearch(e.target.value)}
+                  <TitanInputField
+                    label="Search"
                     placeholder="Search countries..."
-                    className="w-full px-4 py-2.5 rounded-lg border text-sm outline-none transition-colors flex-shrink-0"
-                    style={{
-                      background: 'var(--input-background)',
-                      borderColor: 'var(--input-border)',
-                      color: 'var(--copy-primary)',
-                    }}
+                    value={countrySearch}
+                    onChange={setCountrySearch}
+                    leadingIcon={<Search />}
                   />
-                  <div className="flex-1 min-h-0 overflow-auto border border-[var(--divider)] rounded-lg flex-shrink" style={{ background: 'var(--surface-0)' }}>
+                  <div className="flex-1 min-h-0 overflow-auto flex-shrink rounded-lg border" style={{ borderColor: 'var(--input-slot-border)', background: 'var(--surface-0)' }}>
                     <ul className="py-1">
                       {COUNTRIES.filter((country) =>
                         !countrySearch.trim() || country.toLowerCase().includes(countrySearch.trim().toLowerCase())
                       ).map((country) => (
                         <li key={country}>
-                          <label className="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-[var(--surface-hover)] transition-colors">
-                            <input
-                              type="checkbox"
-                              checked={selectedCountries.has(country)}
-                              onChange={(e) => {
-                                setSelectedCountries((prev) => {
-                                  const next = new Set(prev)
-                                  if (e.target.checked) next.add(country)
-                                  else next.delete(country)
-                                  return next
-                                })
-                              }}
-                              className="rounded border-[var(--input-border)]"
-                              style={{ accentColor: 'var(--button-primary)' }}
-                            />
-                            <span className="text-sm" style={{ color: 'var(--copy-primary)' }}>{country}</span>
-                          </label>
+                          <Checkbox
+                            className="checkbox-root w-full cursor-pointer px-4 py-2.5 rounded-none min-h-[40px]"
+                            style={{ cursor: 'pointer' }}
+                            isSelected={selectedCountries.has(country)}
+                            onChange={(selected: boolean) => {
+                              setSelectedCountries((prev) => {
+                                const next = new Set(prev)
+                                if (selected) next.add(country)
+                                else next.delete(country)
+                                return next
+                              })
+                            }}
+                          >
+                            <span className="checkbox-box" aria-hidden><Check className="checkbox-mark" /></span>
+                            <span className="choice-text" style={{ color: 'var(--copy-primary)' }}>{country}</span>
+                          </Checkbox>
                         </li>
                       ))}
                     </ul>
                   </div>
-                  <div className="flex justify-end gap-2 pt-4 border-t border-[var(--divider)] flex-shrink-0">
-                    <Button
-                      onPress={() => {
-                        setSelectedCountries(new Set())
-                        closeFilterDrawer()
-                      }}
-                      className="titan-btn-secondary"
-                    >
-                      Cancel
-                    </Button>
-                    <Button onPress={applyFilterDrawerAndSearch} className="titan-btn-primary">
-                      Apply
-                    </Button>
+                  <div className="flex justify-end gap-2 pt-4 border-t flex-shrink-0" style={{ borderColor: 'var(--drawer-header-border-bottom)' }}>
+                    <TitanButton variant="secondary" onPress={() => { setSelectedCountries(new Set()); closeFilterDrawer() }}>Cancel</TitanButton>
+                    <TitanButton variant="primary" onPress={applyFilterDrawerAndSearch}>Apply</TitanButton>
                   </div>
                 </div>
               ) : filterDrawer === 'States/Provinces' ? (
                 <div className="flex flex-col flex-1 min-h-0 gap-3">
-                  <input
-                    type="search"
-                    value={statesProvincesSearch}
-                    onChange={(e) => setStatesProvincesSearch(e.target.value)}
+                  <TitanInputField
+                    label="Search"
                     placeholder="Search states..."
-                    className="w-full px-4 py-2.5 rounded-lg border text-sm outline-none transition-colors flex-shrink-0"
-                    style={{
-                      background: 'var(--input-background)',
-                      borderColor: 'var(--input-border)',
-                      color: 'var(--copy-primary)',
-                    }}
+                    value={statesProvincesSearch}
+                    onChange={setStatesProvincesSearch}
+                    leadingIcon={<Search />}
                   />
-                  <div className="flex-1 min-h-0 overflow-auto border border-[var(--divider)] rounded-lg flex-shrink" style={{ background: 'var(--surface-0)' }}>
+                  <div className="flex-1 min-h-0 overflow-auto flex-shrink rounded-lg border" style={{ borderColor: 'var(--input-slot-border)', background: 'var(--surface-0)' }}>
                     <ul className="py-1">
                       {STATES_PROVINCES.filter((item) =>
                         !statesProvincesSearch.trim() || item.toLowerCase().includes(statesProvincesSearch.trim().toLowerCase())
                       ).map((item) => (
                         <li key={item}>
-                          <label className="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-[var(--surface-hover)] transition-colors">
-                            <input
-                              type="checkbox"
-                              checked={selectedStatesProvinces.has(item)}
-                              onChange={(e) => {
-                                setSelectedStatesProvinces((prev) => {
-                                  const next = new Set(prev)
-                                  if (e.target.checked) next.add(item)
-                                  else next.delete(item)
-                                  return next
-                                })
-                              }}
-                              className="rounded border-[var(--input-border)]"
-                              style={{ accentColor: 'var(--button-primary)' }}
-                            />
-                            <span className="text-sm" style={{ color: 'var(--copy-primary)' }}>{item}</span>
-                          </label>
+                          <Checkbox
+                            className="checkbox-root w-full cursor-pointer px-4 py-2.5 rounded-none min-h-[40px]"
+                            style={{ cursor: 'pointer' }}
+                            isSelected={selectedStatesProvinces.has(item)}
+                            onChange={(selected: boolean) => {
+                              setSelectedStatesProvinces((prev) => {
+                                const next = new Set(prev)
+                                if (selected) next.add(item)
+                                else next.delete(item)
+                                return next
+                              })
+                            }}
+                          >
+                            <span className="checkbox-box" aria-hidden><Check className="checkbox-mark" /></span>
+                            <span className="choice-text" style={{ color: 'var(--copy-primary)' }}>{item}</span>
+                          </Checkbox>
                         </li>
                       ))}
                     </ul>
                   </div>
-                  <div className="flex justify-end gap-2 pt-4 border-t border-[var(--divider)] flex-shrink-0">
-                    <Button
-                      onPress={() => {
-                        setSelectedStatesProvinces(new Set())
-                        closeFilterDrawer()
-                      }}
-                      className="titan-btn-secondary"
-                    >
-                      Cancel
-                    </Button>
-                    <Button onPress={applyFilterDrawerAndSearch} className="titan-btn-primary">
-                      Apply
-                    </Button>
+                  <div className="flex justify-end gap-2 pt-4 border-t flex-shrink-0" style={{ borderColor: 'var(--drawer-header-border-bottom)' }}>
+                    <TitanButton variant="secondary" onPress={() => { setSelectedStatesProvinces(new Set()); closeFilterDrawer() }}>Cancel</TitanButton>
+                    <TitanButton variant="primary" onPress={applyFilterDrawerAndSearch}>Apply</TitanButton>
                   </div>
                 </div>
               ) : filterDrawer === 'Age group' ? (
                 <div className="flex flex-col flex-1 min-h-0 gap-3">
-                  <div className="flex-1 min-h-0 overflow-auto border border-[var(--divider)] rounded-lg flex-shrink" style={{ background: 'var(--surface-0)' }}>
+                  <div className="flex-1 min-h-0 overflow-auto flex-shrink rounded-lg border" style={{ borderColor: 'var(--input-slot-border)', background: 'var(--surface-0)' }}>
                     <ul className="py-1">
                       {AGE_GROUPS.map((age) => (
                         <li key={age}>
-                          <label className="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-[var(--surface-hover)] transition-colors">
-                            <input
-                              type="checkbox"
-                              checked={selectedAgeGroups.has(age)}
-                              onChange={(e) => {
-                                setSelectedAgeGroups((prev) => {
-                                  const next = new Set(prev)
-                                  if (e.target.checked) next.add(age)
-                                  else next.delete(age)
-                                  return next
-                                })
-                              }}
-                              className="rounded border-[var(--input-border)]"
-                              style={{ accentColor: 'var(--button-primary)' }}
-                            />
-                            <span className="text-sm" style={{ color: 'var(--copy-primary)' }}>{age}</span>
-                          </label>
+                          <Checkbox
+                            className="checkbox-root w-full cursor-pointer px-4 py-2.5 rounded-none min-h-[40px]"
+                            style={{ cursor: 'pointer' }}
+                            isSelected={selectedAgeGroups.has(age)}
+                            onChange={(selected: boolean) => {
+                              setSelectedAgeGroups((prev) => {
+                                const next = new Set(prev)
+                                if (selected) next.add(age)
+                                else next.delete(age)
+                                return next
+                              })
+                            }}
+                          >
+                            <span className="checkbox-box" aria-hidden><Check className="checkbox-mark" /></span>
+                            <span className="choice-text" style={{ color: 'var(--copy-primary)' }}>{age}</span>
+                          </Checkbox>
                         </li>
                       ))}
                     </ul>
                   </div>
-                  <div className="flex justify-end gap-2 pt-4 border-t border-[var(--divider)] flex-shrink-0">
-                    <Button
-                      onPress={() => {
-                        setSelectedAgeGroups(new Set())
-                        closeFilterDrawer()
-                      }}
-                      className="titan-btn-secondary"
-                    >
-                      Cancel
-                    </Button>
-                    <Button onPress={applyFilterDrawerAndSearch} className="titan-btn-primary">
-                      Apply
-                    </Button>
+                  <div className="flex justify-end gap-2 pt-4 border-t flex-shrink-0" style={{ borderColor: 'var(--drawer-header-border-bottom)' }}>
+                    <TitanButton variant="secondary" onPress={() => { setSelectedAgeGroups(new Set()); closeFilterDrawer() }}>Cancel</TitanButton>
+                    <TitanButton variant="primary" onPress={applyFilterDrawerAndSearch}>Apply</TitanButton>
                   </div>
                 </div>
               ) : filterDrawer === 'Gender ratio' ? (
                 <div className="flex flex-col flex-1 min-h-0 gap-3">
-                  <div className="flex-1 min-h-0 overflow-auto border border-[var(--divider)] rounded-lg flex-shrink" style={{ background: 'var(--surface-0)' }}>
+                  <div className="flex-1 min-h-0 overflow-auto flex-shrink rounded-lg border" style={{ borderColor: 'var(--input-slot-border)', background: 'var(--surface-0)' }}>
                     <ul className="py-1">
                       {GENDER_RATIOS.map((ratio) => (
                         <li key={ratio}>
-                          <label className="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-[var(--surface-hover)] transition-colors">
-                            <input
-                              type="checkbox"
-                              checked={selectedGenderRatios.has(ratio)}
-                              onChange={(e) => {
-                                setSelectedGenderRatios((prev) => {
-                                  const next = new Set(prev)
-                                  if (e.target.checked) next.add(ratio)
-                                  else next.delete(ratio)
-                                  return next
-                                })
-                              }}
-                              className="rounded border-[var(--input-border)]"
-                              style={{ accentColor: 'var(--button-primary)' }}
-                            />
-                            <span className="text-sm" style={{ color: 'var(--copy-primary)' }}>{ratio}</span>
-                          </label>
+                          <Checkbox
+                            className="checkbox-root w-full cursor-pointer px-4 py-2.5 rounded-none min-h-[40px]"
+                            style={{ cursor: 'pointer' }}
+                            isSelected={selectedGenderRatios.has(ratio)}
+                            onChange={(selected: boolean) => {
+                              setSelectedGenderRatios((prev) => {
+                                const next = new Set(prev)
+                                if (selected) next.add(ratio)
+                                else next.delete(ratio)
+                                return next
+                              })
+                            }}
+                          >
+                            <span className="checkbox-box" aria-hidden><Check className="checkbox-mark" /></span>
+                            <span className="choice-text" style={{ color: 'var(--copy-primary)' }}>{ratio}</span>
+                          </Checkbox>
                         </li>
                       ))}
                     </ul>
                   </div>
-                  <div className="flex justify-end gap-2 pt-4 border-t border-[var(--divider)] flex-shrink-0">
-                    <Button
-                      onPress={() => {
-                        setSelectedGenderRatios(new Set())
-                        closeFilterDrawer()
-                      }}
-                      className="titan-btn-secondary"
-                    >
-                      Cancel
-                    </Button>
-                    <Button onPress={applyFilterDrawerAndSearch} className="titan-btn-primary">
-                      Apply
-                    </Button>
+                  <div className="flex justify-end gap-2 pt-4 border-t flex-shrink-0" style={{ borderColor: 'var(--drawer-header-border-bottom)' }}>
+                    <TitanButton variant="secondary" onPress={() => { setSelectedGenderRatios(new Set()); closeFilterDrawer() }}>Cancel</TitanButton>
+                    <TitanButton variant="primary" onPress={applyFilterDrawerAndSearch}>Apply</TitanButton>
                   </div>
                 </div>
               ) : filterDrawer === 'Creator price range' ? (
                 <div className="flex flex-col flex-1 min-h-0 gap-3">
-                  <div className="flex-1 min-h-0 overflow-auto border border-[var(--divider)] rounded-lg flex-shrink" style={{ background: 'var(--surface-0)' }}>
+                  <div className="flex-1 min-h-0 overflow-auto flex-shrink rounded-lg border" style={{ borderColor: 'var(--input-slot-border)', background: 'var(--surface-0)' }}>
                     <ul className="py-1">
                       {CREATOR_PRICE_RANGES.map((opt) => (
                         <li key={opt}>
-                          <label className="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-[var(--surface-hover)] transition-colors">
-                            <input type="checkbox" checked={selectedCreatorPriceRanges.has(opt)} onChange={(e) => { setSelectedCreatorPriceRanges((p) => { const n = new Set(p); if (e.target.checked) n.add(opt); else n.delete(opt); return n }) }} className="rounded border-[var(--input-border)]" style={{ accentColor: 'var(--button-primary)' }} />
-                            <span className="text-sm" style={{ color: 'var(--copy-primary)' }}>{opt}</span>
-                          </label>
+                          <Checkbox className="checkbox-root w-full cursor-pointer px-4 py-2.5 rounded-none min-h-[40px]" style={{ cursor: 'pointer' }} isSelected={selectedCreatorPriceRanges.has(opt)} onChange={(selected: boolean) => { setSelectedCreatorPriceRanges((p) => { const n = new Set(p); if (selected) n.add(opt); else n.delete(opt); return n }) }}>
+                            <span className="checkbox-box" aria-hidden><Check className="checkbox-mark" /></span>
+                            <span className="choice-text" style={{ color: 'var(--copy-primary)' }}>{opt}</span>
+                          </Checkbox>
                         </li>
                       ))}
                     </ul>
                   </div>
-                  <div className="flex justify-end gap-2 pt-4 border-t border-[var(--divider)] flex-shrink-0">
-                    <Button onPress={() => { setSelectedCreatorPriceRanges(new Set()); closeFilterDrawer() }} className="titan-btn-secondary">Cancel</Button>
-                    <Button onPress={applyFilterDrawerAndSearch} className="titan-btn-primary">Apply</Button>
+                  <div className="flex justify-end gap-2 pt-4 border-t flex-shrink-0" style={{ borderColor: 'var(--drawer-header-border-bottom)' }}>
+                    <TitanButton variant="secondary" onPress={() => { setSelectedCreatorPriceRanges(new Set()); closeFilterDrawer() }}>Cancel</TitanButton>
+                    <TitanButton variant="primary" onPress={applyFilterDrawerAndSearch}>Apply</TitanButton>
                   </div>
                 </div>
               ) : filterDrawer === 'Followers' ? (
                 <div className="flex flex-col flex-1 min-h-0 gap-3">
-                  <div className="flex-1 min-h-0 overflow-auto border border-[var(--divider)] rounded-lg flex-shrink" style={{ background: 'var(--surface-0)' }}>
+                  <div className="flex-1 min-h-0 overflow-auto flex-shrink rounded-lg border" style={{ borderColor: 'var(--input-slot-border)', background: 'var(--surface-0)' }}>
                     <ul className="py-1">
                       {FOLLOWERS_RANGES.map((opt) => (
                         <li key={opt}>
-                          <label className="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-[var(--surface-hover)] transition-colors">
-                            <input type="checkbox" checked={selectedFollowersRanges.has(opt)} onChange={(e) => { setSelectedFollowersRanges((p) => { const n = new Set(p); if (e.target.checked) n.add(opt); else n.delete(opt); return n }) }} className="rounded border-[var(--input-border)]" style={{ accentColor: 'var(--button-primary)' }} />
-                            <span className="text-sm" style={{ color: 'var(--copy-primary)' }}>{opt}</span>
-                          </label>
+                          <Checkbox className="checkbox-root w-full cursor-pointer px-4 py-2.5 rounded-none min-h-[40px]" style={{ cursor: 'pointer' }} isSelected={selectedFollowersRanges.has(opt)} onChange={(selected: boolean) => { setSelectedFollowersRanges((p) => { const n = new Set(p); if (selected) n.add(opt); else n.delete(opt); return n }) }}>
+                            <span className="checkbox-box" aria-hidden><Check className="checkbox-mark" /></span>
+                            <span className="choice-text" style={{ color: 'var(--copy-primary)' }}>{opt}</span>
+                          </Checkbox>
                         </li>
                       ))}
                     </ul>
                   </div>
-                  <div className="flex justify-end gap-2 pt-4 border-t border-[var(--divider)] flex-shrink-0">
-                    <Button onPress={() => { setSelectedFollowersRanges(new Set()); closeFilterDrawer() }} className="titan-btn-secondary">Cancel</Button>
-                    <Button onPress={applyFilterDrawerAndSearch} className="titan-btn-primary">Apply</Button>
+                  <div className="flex justify-end gap-2 pt-4 border-t flex-shrink-0" style={{ borderColor: 'var(--drawer-header-border-bottom)' }}>
+                    <TitanButton variant="secondary" onPress={() => { setSelectedFollowersRanges(new Set()); closeFilterDrawer() }}>Cancel</TitanButton>
+                    <TitanButton variant="primary" onPress={applyFilterDrawerAndSearch}>Apply</TitanButton>
                   </div>
                 </div>
               ) : filterDrawer === 'Average views' ? (
                 <div className="flex flex-col flex-1 min-h-0 gap-3">
-                  <div className="flex-1 min-h-0 overflow-auto border border-[var(--divider)] rounded-lg flex-shrink" style={{ background: 'var(--surface-0)' }}>
+                  <div className="flex-1 min-h-0 overflow-auto flex-shrink rounded-lg border" style={{ borderColor: 'var(--input-slot-border)', background: 'var(--surface-0)' }}>
                     <ul className="py-1">
                       {AVERAGE_VIEWS_RANGES.map((opt) => (
                         <li key={opt}>
-                          <label className="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-[var(--surface-hover)] transition-colors">
-                            <input type="checkbox" checked={selectedAverageViewsRanges.has(opt)} onChange={(e) => { setSelectedAverageViewsRanges((p) => { const n = new Set(p); if (e.target.checked) n.add(opt); else n.delete(opt); return n }) }} className="rounded border-[var(--input-border)]" style={{ accentColor: 'var(--button-primary)' }} />
-                            <span className="text-sm" style={{ color: 'var(--copy-primary)' }}>{opt}</span>
-                          </label>
+                          <Checkbox className="checkbox-root w-full cursor-pointer px-4 py-2.5 rounded-none min-h-[40px]" style={{ cursor: 'pointer' }} isSelected={selectedAverageViewsRanges.has(opt)} onChange={(selected: boolean) => { setSelectedAverageViewsRanges((p) => { const n = new Set(p); if (selected) n.add(opt); else n.delete(opt); return n }) }}>
+                            <span className="checkbox-box" aria-hidden><Check className="checkbox-mark" /></span>
+                            <span className="choice-text" style={{ color: 'var(--copy-primary)' }}>{opt}</span>
+                          </Checkbox>
                         </li>
                       ))}
                     </ul>
                   </div>
-                  <div className="flex justify-end gap-2 pt-4 border-t border-[var(--divider)] flex-shrink-0">
-                    <Button onPress={() => { setSelectedAverageViewsRanges(new Set()); closeFilterDrawer() }} className="titan-btn-secondary">Cancel</Button>
-                    <Button onPress={applyFilterDrawerAndSearch} className="titan-btn-primary">Apply</Button>
+                  <div className="flex justify-end gap-2 pt-4 border-t flex-shrink-0" style={{ borderColor: 'var(--drawer-header-border-bottom)' }}>
+                    <TitanButton variant="secondary" onPress={() => { setSelectedAverageViewsRanges(new Set()); closeFilterDrawer() }}>Cancel</TitanButton>
+                    <TitanButton variant="primary" onPress={applyFilterDrawerAndSearch}>Apply</TitanButton>
                   </div>
                 </div>
               ) : filterDrawer === 'Median views' ? (
                 <div className="flex flex-col flex-1 min-h-0 gap-3">
-                  <div className="flex-1 min-h-0 overflow-auto border border-[var(--divider)] rounded-lg flex-shrink" style={{ background: 'var(--surface-0)' }}>
+                  <div className="flex-1 min-h-0 overflow-auto flex-shrink rounded-lg border" style={{ borderColor: 'var(--input-slot-border)', background: 'var(--surface-0)' }}>
                     <ul className="py-1">
                       {MEDIAN_VIEWS_RANGES.map((opt) => (
                         <li key={opt}>
-                          <label className="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-[var(--surface-hover)] transition-colors">
-                            <input type="checkbox" checked={selectedMedianViewsRanges.has(opt)} onChange={(e) => { setSelectedMedianViewsRanges((p) => { const n = new Set(p); if (e.target.checked) n.add(opt); else n.delete(opt); return n }) }} className="rounded border-[var(--input-border)]" style={{ accentColor: 'var(--button-primary)' }} />
-                            <span className="text-sm" style={{ color: 'var(--copy-primary)' }}>{opt}</span>
-                          </label>
+                          <Checkbox className="checkbox-root w-full cursor-pointer px-4 py-2.5 rounded-none min-h-[40px]" style={{ cursor: 'pointer' }} isSelected={selectedMedianViewsRanges.has(opt)} onChange={(selected: boolean) => { setSelectedMedianViewsRanges((p) => { const n = new Set(p); if (selected) n.add(opt); else n.delete(opt); return n }) }}>
+                            <span className="checkbox-box" aria-hidden><Check className="checkbox-mark" /></span>
+                            <span className="choice-text" style={{ color: 'var(--copy-primary)' }}>{opt}</span>
+                          </Checkbox>
                         </li>
                       ))}
                     </ul>
                   </div>
-                  <div className="flex justify-end gap-2 pt-4 border-t border-[var(--divider)] flex-shrink-0">
-                    <Button onPress={() => { setSelectedMedianViewsRanges(new Set()); closeFilterDrawer() }} className="titan-btn-secondary">Cancel</Button>
-                    <Button onPress={applyFilterDrawerAndSearch} className="titan-btn-primary">Apply</Button>
+                  <div className="flex justify-end gap-2 pt-4 border-t flex-shrink-0" style={{ borderColor: 'var(--drawer-header-border-bottom)' }}>
+                    <TitanButton variant="secondary" onPress={() => { setSelectedMedianViewsRanges(new Set()); closeFilterDrawer() }}>Cancel</TitanButton>
+                    <TitanButton variant="primary" onPress={applyFilterDrawerAndSearch}>Apply</TitanButton>
                   </div>
                 </div>
               ) : filterDrawer === 'Engagement rate' ? (
                 <div className="flex flex-col flex-1 min-h-0 gap-3">
-                  <div className="flex-1 min-h-0 overflow-auto border border-[var(--divider)] rounded-lg flex-shrink" style={{ background: 'var(--surface-0)' }}>
+                  <div className="flex-1 min-h-0 overflow-auto flex-shrink rounded-lg border" style={{ borderColor: 'var(--input-slot-border)', background: 'var(--surface-0)' }}>
                     <ul className="py-1">
                       {ENGAGEMENT_RATE_RANGES.map((opt) => (
                         <li key={opt}>
-                          <label className="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-[var(--surface-hover)] transition-colors">
-                            <input type="checkbox" checked={selectedEngagementRateRanges.has(opt)} onChange={(e) => { setSelectedEngagementRateRanges((p) => { const n = new Set(p); if (e.target.checked) n.add(opt); else n.delete(opt); return n }) }} className="rounded border-[var(--input-border)]" style={{ accentColor: 'var(--button-primary)' }} />
-                            <span className="text-sm" style={{ color: 'var(--copy-primary)' }}>{opt}</span>
-                          </label>
+                          <Checkbox className="checkbox-root w-full cursor-pointer px-4 py-2.5 rounded-none min-h-[40px]" style={{ cursor: 'pointer' }} isSelected={selectedEngagementRateRanges.has(opt)} onChange={(selected: boolean) => { setSelectedEngagementRateRanges((p) => { const n = new Set(p); if (selected) n.add(opt); else n.delete(opt); return n }) }}>
+                            <span className="checkbox-box" aria-hidden><Check className="checkbox-mark" /></span>
+                            <span className="choice-text" style={{ color: 'var(--copy-primary)' }}>{opt}</span>
+                          </Checkbox>
                         </li>
                       ))}
                     </ul>
                   </div>
-                  <div className="flex justify-end gap-2 pt-4 border-t border-[var(--divider)] flex-shrink-0">
-                    <Button onPress={() => { setSelectedEngagementRateRanges(new Set()); closeFilterDrawer() }} className="titan-btn-secondary">Cancel</Button>
-                    <Button onPress={applyFilterDrawerAndSearch} className="titan-btn-primary">Apply</Button>
+                  <div className="flex justify-end gap-2 pt-4 border-t flex-shrink-0" style={{ borderColor: 'var(--drawer-header-border-bottom)' }}>
+                    <TitanButton variant="secondary" onPress={() => { setSelectedEngagementRateRanges(new Set()); closeFilterDrawer() }}>Cancel</TitanButton>
+                    <TitanButton variant="primary" onPress={applyFilterDrawerAndSearch}>Apply</TitanButton>
                   </div>
                 </div>
               ) : filterDrawer === 'Languages' ? (
                 <div className="flex flex-col flex-1 min-h-0 gap-3">
-                  <input
-                    type="search"
-                    value={languageSearch}
-                    onChange={(e) => setLanguageSearch(e.target.value)}
+                  <TitanInputField
+                    label="Search"
                     placeholder="Search languages..."
-                    className="w-full px-4 py-2.5 rounded-lg border text-sm outline-none transition-colors flex-shrink-0"
-                    style={{
-                      background: 'var(--input-background)',
-                      borderColor: 'var(--input-border)',
-                      color: 'var(--copy-primary)',
-                    }}
+                    value={languageSearch}
+                    onChange={setLanguageSearch}
+                    leadingIcon={<Search />}
                   />
-                  <div className="flex-1 min-h-0 overflow-auto border border-[var(--divider)] rounded-lg flex-shrink" style={{ background: 'var(--surface-0)' }}>
+                  <div className="flex-1 min-h-0 overflow-auto flex-shrink rounded-lg border" style={{ borderColor: 'var(--input-slot-border)', background: 'var(--surface-0)' }}>
                     <ul className="py-1">
                       {LANGUAGES.filter((lang) =>
                         !languageSearch.trim() || lang.toLowerCase().includes(languageSearch.trim().toLowerCase())
                       ).map((lang) => (
                         <li key={lang}>
-                          <label className="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-[var(--surface-hover)] transition-colors">
-                            <input
-                              type="checkbox"
-                              checked={selectedLanguages.has(lang)}
-                              onChange={(e) => {
-                                setSelectedLanguages((prev) => {
-                                  const next = new Set(prev)
-                                  if (e.target.checked) next.add(lang)
-                                  else next.delete(lang)
-                                  return next
-                                })
-                              }}
-                              className="rounded border-[var(--input-border)]"
-                              style={{ accentColor: 'var(--button-primary)' }}
-                            />
-                            <span className="text-sm" style={{ color: 'var(--copy-primary)' }}>{lang}</span>
-                          </label>
+                          <Checkbox
+                            className="checkbox-root w-full cursor-pointer px-4 py-2.5 rounded-none min-h-[40px]"
+                            style={{ cursor: 'pointer' }}
+                            isSelected={selectedLanguages.has(lang)}
+                            onChange={(selected: boolean) => {
+                              setSelectedLanguages((prev) => {
+                                const next = new Set(prev)
+                                if (selected) next.add(lang)
+                                else next.delete(lang)
+                                return next
+                              })
+                            }}
+                          >
+                            <span className="checkbox-box" aria-hidden><Check className="checkbox-mark" /></span>
+                            <span className="choice-text" style={{ color: 'var(--copy-primary)' }}>{lang}</span>
+                          </Checkbox>
                         </li>
                       ))}
                     </ul>
                   </div>
-                  <div className="flex justify-end gap-2 pt-4 border-t border-[var(--divider)] flex-shrink-0">
-                    <Button
-                      onPress={() => {
-                        setSelectedLanguages(new Set())
-                        closeFilterDrawer()
-                      }}
-                      className="titan-btn-secondary"
-                    >
-                      Cancel
-                    </Button>
-                    <Button onPress={applyFilterDrawerAndSearch} className="titan-btn-primary">
-                      Apply
-                    </Button>
+                  <div className="flex justify-end gap-2 pt-4 border-t flex-shrink-0" style={{ borderColor: 'var(--drawer-header-border-bottom)' }}>
+                    <TitanButton variant="secondary" onPress={() => { setSelectedLanguages(new Set()); closeFilterDrawer() }}>Cancel</TitanButton>
+                    <TitanButton variant="primary" onPress={applyFilterDrawerAndSearch}>Apply</TitanButton>
                   </div>
                 </div>
               ) : (
@@ -1462,400 +1383,302 @@ export function CreatorSearch({ onBack }: CreatorSearchProps) {
                   <p className="text-sm" style={{ color: 'var(--copy-secondary)' }}>
                     Content for &quot;{filterDrawer}&quot; — to be defined.
                   </p>
-                  <div className="flex justify-end gap-2 pt-4 border-t border-[var(--divider)]">
-                    <Button onPress={closeFilterDrawer} className="titan-btn-secondary">
-                      Cancel
-                    </Button>
-                    <Button onPress={closeFilterDrawer} className="titan-btn-primary">
-                      Apply
-                    </Button>
+                  <div className="flex justify-end gap-2 pt-4 border-t" style={{ borderColor: 'var(--drawer-header-border-bottom)' }}>
+                    <TitanButton variant="secondary" onPress={closeFilterDrawer}>Cancel</TitanButton>
+                    <TitanButton variant="primary" onPress={closeFilterDrawer}>Apply</TitanButton>
                   </div>
                 </div>
               )}
+              </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Modal: Creator insights — vídeos Pexels */}
+      {/* Dialog Titan: Creator insights — sin X; footer Close (secondary) + Load more (primary) */}
       {insightsCreator && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/40" aria-hidden onClick={() => setInsightsCreator(null)} />
-          <div
-            className="relative w-full max-w-2xl max-h-[90vh] flex flex-col rounded-xl overflow-hidden border shadow-xl z-10"
-            style={{ background: 'var(--surface-page)', borderColor: 'var(--divider)' }}
-          >
-            <div className="flex-shrink-0 flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: 'var(--divider)' }}>
-              <h2 className="text-xl font-semibold" style={{ color: 'var(--copy-primary)' }}>Creator insights</h2>
-              <Button
-                onPress={() => setInsightsCreator(null)}
-                className="rounded-full p-2"
-                style={{ color: 'var(--copy-secondary)' }}
-                aria-label="Cerrar"
-              >
-                <X className="w-5 h-5" strokeWidth={1.5} />
-              </Button>
-            </div>
-            <div className="flex-1 overflow-auto p-6 space-y-6">
-              <div className="rounded-xl border p-4 flex gap-4" style={{ borderColor: 'var(--divider)', background: 'var(--surface-0)' }}>
-                <img
-                  src={insightsCreator.avatarUrl}
-                  alt=""
-                  className="w-14 h-14 rounded-full object-cover flex-shrink-0"
-                  style={{ background: 'var(--surface-1)' }}
-                />
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-base" style={{ color: 'var(--text-body)' }}>{insightsCreator.userName}</p>
-                  <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{insightsCreator.handle}</p>
-                  <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{insightsCreator.location}</p>
-                  <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>{insightsCreator.videoCount} videos</p>
-                </div>
-              </div>
-              <div className="grid grid-cols-3 gap-4 text-center">
-                <div>
-                  <p className="text-lg font-semibold" style={{ color: 'var(--text-body)' }}>{insightsCreator.followers}</p>
-                  <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Followers</p>
-                </div>
-                <div>
-                  <p className="text-lg font-semibold" style={{ color: 'var(--text-body)' }}>{insightsCreator.engagement}</p>
-                  <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Engagement</p>
-                </div>
-                <div>
-                  <p className="text-lg font-semibold" style={{ color: 'var(--text-body)' }}>{insightsCreator.likes}</p>
-                  <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Likes</p>
-                </div>
-              </div>
-              <div>
-                <h3 className="text-sm font-semibold mb-3" style={{ color: 'var(--copy-primary)' }}>Videos</h3>
-                <CreatorDetailVideos query="lifestyle" />
-              </div>
-            </div>
-          </div>
-        </div>
+        <CreatorInsightsDialog creator={insightsCreator} onClose={() => setInsightsCreator(null)} />
       )}
 
-      {/* Drawer: New campaign — Titan/brown, radio sin default, checkbox Titan, aviso Info */}
+      {/* Drawer: New campaign — 100% Titan (shell = overlay + modal + panel; drawer-close-button; form = drawer-body) */}
       {drawer === 'new' && (
         <div className="fixed inset-0 z-50 flex justify-end">
-          <div className="absolute inset-0 bg-black/30" aria-hidden onClick={() => setDrawer(null)} />
-          <div
-            className="relative w-full max-w-md shadow-xl flex flex-col max-h-full overflow-auto rounded-l-xl"
-            style={{ background: 'var(--surface-page)', borderLeft: '1px solid var(--divider)' }}
-          >
-            <div className="flex items-center justify-between p-6 border-b" style={{ borderColor: 'var(--divider)' }}>
-              <h2 className="text-xl font-semibold" style={{ color: 'var(--copy-primary)' }}>New campaign</h2>
-              <Button onPress={() => setDrawer(null)} className="p-2 rounded-lg" style={{ color: 'var(--copy-secondary)' }} aria-label="Close">
-                <X className="w-5 h-5" />
-              </Button>
-            </div>
-            <form
-              className="p-6 space-y-5 flex-1 overflow-auto"
-              onSubmit={(e) => {
-                e.preventDefault()
-                setDrawer(null)
-                setSuccess({ type: 'created', name: campaignName || 'Campaign' })
-                setCampaignName('')
-                setBrandName('')
-                setCampaignDescription('')
-                setSendNotification(false)
-                setBrandOption(null)
-              }}
-            >
-              <div>
-                <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--copy-primary)' }}>Campaign name</label>
-                <div className="relative">
-                  <Pencil className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--copy-tertiary)' }} />
-                  <input
-                    type="text"
-                    value={campaignName}
-                    onChange={(e) => setCampaignName(e.target.value)}
-                    placeholder="Name your campaign"
-                    className="w-full pl-9 pr-3 py-2.5 border rounded-lg focus:outline-none focus-visible:ring-2"
-                    style={{
-                      borderColor: 'var(--input-border)',
-                      background: 'var(--surface-0)',
-                      color: 'var(--copy-primary)',
-                    }}
-                  />
-                </div>
-              </div>
-              <div>
-                <span className="block text-sm font-medium mb-2" style={{ color: 'var(--copy-primary)' }}>Brand</span>
-                <RadioGroup
-                  value={brandOption ?? undefined}
-                  onChange={(v) => setBrandOption(v as 'custom' | 'profiles')}
-                  className="titan-radio-group flex flex-col gap-3"
-                  aria-label="Brand"
-                >
-                  <Radio value="custom" className="titan-radio flex items-center gap-3 cursor-pointer">
-                    <span className="titan-radio-indicator flex-shrink-0">
-                      <span className="titan-radio-ring" aria-hidden />
-                      <SelectionIndicator className="titan-radio-dot" />
-                    </span>
-                    <span className="text-sm" style={{ color: 'var(--copy-primary)' }}>Enter custom brand name</span>
-                  </Radio>
-                  <Radio value="profiles" className="titan-radio flex items-center gap-3 cursor-pointer">
-                    <span className="titan-radio-indicator flex-shrink-0">
-                      <span className="titan-radio-ring" aria-hidden />
-                      <SelectionIndicator className="titan-radio-dot" />
-                    </span>
-                    <span className="text-sm" style={{ color: 'var(--copy-primary)' }}>Select from brand profiles</span>
-                  </Radio>
-                </RadioGroup>
-              </div>
-              {brandOption === 'custom' && (
-                <div className="space-y-1">
-                  <input
-                    type="text"
-                    value={brandName}
-                    onChange={(e) => setBrandName(e.target.value.slice(0, 60))}
-                    placeholder="Enter brand name"
-                    maxLength={60}
-                    className="w-full px-3 py-2.5 border rounded-lg focus:outline-none focus-visible:ring-2"
-                    style={{ borderColor: 'var(--input-border)', background: 'var(--surface-0)', color: 'var(--copy-primary)' }}
-                  />
-                  <p className="text-xs" style={{ color: 'var(--copy-tertiary)' }}>{brandName.length}/60 characters</p>
-                </div>
-              )}
-              <div>
-                <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--copy-primary)' }}>Campaign description</label>
-                <textarea
-                  value={campaignDescription}
-                  onChange={(e) => setCampaignDescription(e.target.value.slice(0, 1000))}
-                  placeholder="Enter campaign description"
-                  rows={4}
-                  maxLength={1000}
-                  className="w-full px-3 py-2.5 border rounded-lg resize-none focus:outline-none focus-visible:ring-2"
-                  style={{ borderColor: 'var(--input-border)', background: 'var(--surface-0)', color: 'var(--copy-primary)' }}
-                />
-                <p className="text-xs mt-1" style={{ color: 'var(--copy-tertiary)' }}>{campaignDescription.length}/1000 characters</p>
-              </div>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={sendNotification}
-                  onChange={(e) => setSendNotification(e.target.checked)}
-                  className="rounded border-2 w-5 h-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
-                  style={{ borderColor: 'var(--input-border)', accentColor: 'var(--checkbox-selected-background)' }}
-                />
-                <span className="text-sm" style={{ color: 'var(--copy-primary)' }}>Send notification to creators</span>
-              </label>
-              <div
-                className="rounded-lg px-4 py-3 text-sm"
-                style={{
-                  background: 'var(--color-information-100, var(--color-blue-20))',
-                  color: 'var(--color-information-800, var(--color-blue-800))',
-                  border: '1px solid var(--color-information-200, var(--color-blue-30))',
+          <div className="drawer-overlay absolute inset-0" aria-hidden onClick={() => setDrawer(null)} />
+          <div className="drawer-modal relative flex-shrink-0">
+            <div className="drawer-panel">
+              <header className="drawer-header">
+                <h3 className="drawer-title">New campaign</h3>
+                <TitanIconButton variant="ghost" className="drawer-close-button shrink-0 flex items-center justify-center" aria-label="Close drawer" onPress={() => setDrawer(null)}>
+                  <X className="shrink-0" />
+                </TitanIconButton>
+              </header>
+              <form
+                className="drawer-body flex flex-col gap-5 min-h-0"
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  setDrawer(null)
+                  setSuccess({ type: 'created', name: campaignName || 'Campaign' })
+                  setCampaignName('')
+                  setBrandName('')
+                  setCampaignDescription('')
+                  setSendNotification(false)
+                  setBrandOption(null)
                 }}
               >
-                {selectedCreatorIds.size} creators will be added
-              </div>
-              <div className="flex justify-end pt-2">
-                <Button type="submit" className="titan-btn-primary px-4 py-2.5 text-sm font-semibold rounded-lg">
-                  Create campaign
-                </Button>
-              </div>
-            </form>
+                <TitanInputField
+                  label="Campaign name"
+                  placeholder="Name your campaign"
+                  value={campaignName}
+                  onChange={setCampaignName}
+                  leadingIcon={<Pencil />}
+                />
+                <div>
+                  <RadioGroup
+                    value={brandOption ?? undefined}
+                    onChange={(v) => setBrandOption(v as 'custom' | 'profiles')}
+                    className="choice-group"
+                    aria-label="Brand"
+                  >
+                    <label className="choice-group-label">Brand</label>
+                    <div className="choice-list">
+                      <Radio value="custom" className="radio-root cursor-pointer">
+                        <span className="radio-box" aria-hidden><span className="radio-dot" /></span>
+                        <span className="choice-text">Enter custom brand name</span>
+                      </Radio>
+                      <Radio value="profiles" className="radio-root cursor-pointer">
+                        <span className="radio-box" aria-hidden><span className="radio-dot" /></span>
+                        <span className="choice-text">Select from brand profiles</span>
+                      </Radio>
+                    </div>
+                  </RadioGroup>
+                </div>
+                {brandOption === 'custom' && (
+                  <TitanInputField
+                    label="Brand name"
+                    placeholder="Enter brand name"
+                    value={brandName}
+                    onChange={(v) => setBrandName(v.slice(0, 60))}
+                    counter={`${brandName.length}/60`}
+                  />
+                )}
+                <TitanTextareaField
+                  label="Campaign description"
+                  placeholder="Enter campaign description"
+                  value={campaignDescription}
+                  onChange={(v) => setCampaignDescription(v.slice(0, 1000))}
+                  counter={`${campaignDescription.length}/1000`}
+                />
+                <Checkbox
+                  className="checkbox-root cursor-pointer"
+                  isSelected={sendNotification}
+                  onChange={setSendNotification}
+                >
+                  <span className="checkbox-box" aria-hidden><Check className="checkbox-mark" strokeWidth={3} /></span>
+                  <span className="choice-text">Send notification to creators</span>
+                </Checkbox>
+                <TitanTag
+                  label={`${selectedCreatorIds.size} creators will be added`}
+                  tone="ocean"
+                />
+                <div className="flex justify-end pt-2">
+                  <TitanButton type="submit" variant="primary">
+                    Create campaign
+                  </TitanButton>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Drawer: Add to existing campaign — Titan/brown, checkbox Titan, aviso Info */}
+      {/* Drawer: Add to existing campaign — 100% Titan (misma shell que New campaign, TitanSelect, Checkbox Titan, TitanTag, TitanButton) */}
       {drawer === 'existing' && (
         <div className="fixed inset-0 z-50 flex justify-end">
-          <div className="absolute inset-0 bg-black/30" aria-hidden onClick={() => setDrawer(null)} />
-          <div
-            className="relative w-full max-w-md shadow-xl flex flex-col max-h-full overflow-auto rounded-l-xl"
-            style={{ background: 'var(--surface-page)', borderLeft: '1px solid var(--divider)' }}
-          >
-            <div className="flex items-center justify-between p-6 border-b" style={{ borderColor: 'var(--divider)' }}>
-              <h2 className="text-xl font-semibold" style={{ color: 'var(--copy-primary)' }}>Add to existing campaign</h2>
-              <Button onPress={() => setDrawer(null)} className="p-2 rounded-lg" style={{ color: 'var(--copy-secondary)' }} aria-label="Close">
-                <X className="w-5 h-5" />
-              </Button>
-            </div>
-            <form
-              className="p-6 space-y-5"
-              onSubmit={(e) => {
-                e.preventDefault()
-                setDrawer(null)
-                setSuccess({ type: 'added' })
-                setSelectedCampaignId('')
-                setSendNotificationExisting(false)
-              }}
-            >
-              <div>
-                <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--copy-primary)' }}>Select campaign</label>
-                <select
-                  value={selectedCampaignId}
-                  onChange={(e) => setSelectedCampaignId(e.target.value)}
-                  className="w-full px-3 py-2.5 border rounded-lg focus:outline-none focus-visible:ring-2"
-                  style={{ borderColor: 'var(--input-border)', background: 'var(--surface-0)', color: 'var(--copy-primary)' }}
-                >
-                  <option value="">Select an already creating campaign</option>
-                  {MOCK_CAMPAIGNS.map((c) => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
-                  ))}
-                </select>
-              </div>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={sendNotificationExisting}
-                  onChange={(e) => setSendNotificationExisting(e.target.checked)}
-                  className="rounded border-2 w-5 h-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
-                  style={{ borderColor: 'var(--input-border)', accentColor: 'var(--checkbox-selected-background)' }}
-                />
-                <span className="text-sm" style={{ color: 'var(--copy-primary)' }}>Send notification to creators</span>
-              </label>
-              <div
-                className="rounded-lg px-4 py-3 text-sm"
-                style={{
-                  background: 'var(--color-information-100, var(--color-blue-20))',
-                  color: 'var(--color-information-800, var(--color-blue-800))',
-                  border: '1px solid var(--color-information-200, var(--color-blue-30))',
+          <div className="drawer-overlay absolute inset-0" aria-hidden onClick={() => setDrawer(null)} />
+          <div className="drawer-modal relative flex-shrink-0">
+            <div className="drawer-panel">
+              <header className="drawer-header">
+                <h3 className="drawer-title">Add to existing campaign</h3>
+                <TitanIconButton variant="ghost" className="drawer-close-button shrink-0 flex items-center justify-center" aria-label="Close drawer" onPress={() => setDrawer(null)}>
+                  <X className="shrink-0" />
+                </TitanIconButton>
+              </header>
+              <form
+                className="drawer-body flex flex-col gap-5 min-h-0"
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  setDrawer(null)
+                  setSuccess({ type: 'added' })
+                  setSelectedCampaignId('')
+                  setSendNotificationExisting(false)
                 }}
               >
-                {selectedCreatorIds.size} creators will be added
-              </div>
-              <div className="flex justify-end pt-2">
-                <Button type="submit" className="titan-btn-primary px-4 py-2.5 text-sm font-semibold rounded-lg">
-                  Add to campaign
-                </Button>
-              </div>
-            </form>
+                <Select
+                  className="select-root"
+                  selectedKey={selectedCampaignId || '__none'}
+                  onSelectionChange={(key) => setSelectedCampaignId(key === '__none' ? '' : String(key))}
+                  aria-label="Select campaign"
+                >
+                  <SelectLabel className="select-label">Select campaign</SelectLabel>
+                  <Button className="select-trigger">
+                    <SelectValue />
+                    <span className="select-trigger-chevron" aria-hidden><ChevronDown /></span>
+                  </Button>
+                  <Popover className="select-popover" placement="bottom start">
+                    <ListBox className="select-list">
+                      <ListBoxItem id="__none" className="select-item" textValue="Select an already creating campaign">
+                        <span className="select-item-start">Select an already creating campaign</span>
+                      </ListBoxItem>
+                      {MOCK_CAMPAIGNS.map((c) => (
+                        <ListBoxItem key={c.id} id={c.id} className="select-item" textValue={c.name}>
+                          <span className="select-item-start">{c.name}</span>
+                        </ListBoxItem>
+                      ))}
+                    </ListBox>
+                  </Popover>
+                </Select>
+                <Checkbox
+                  className="checkbox-root cursor-pointer"
+                  isSelected={sendNotificationExisting}
+                  onChange={setSendNotificationExisting}
+                >
+                  <span className="checkbox-box" aria-hidden><Check className="checkbox-mark" strokeWidth={3} /></span>
+                  <span className="choice-text">Send notification to creators</span>
+                </Checkbox>
+                <TitanTag label={`${selectedCreatorIds.size} creators will be added`} tone="ocean" />
+                <div className="flex justify-end pt-2">
+                  <TitanButton type="submit" variant="primary">
+                    Add to campaign
+                  </TitanButton>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Modal: Save search — formulario y confirmación en el mismo modal */}
+      {/* Dialog: Save search — 100% Titan, sin X, footer Close (secondary) izquierda */}
       {saveSearchOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
-          <div className="absolute inset-0 bg-black/30" aria-hidden onClick={() => { setSaveSearchOpen(false); setSaveSearchConfirmed(false) }} />
-          <div
-            className="relative rounded-xl shadow-xl w-full max-w-md p-6"
-            style={{ background: 'var(--surface-page)', border: '1px solid var(--divider)' }}
-          >
-            <h2 className="text-xl font-semibold mb-4" style={{ color: 'var(--copy-primary)' }}>Save search</h2>
-            {saveSearchConfirmed ? (
-              <>
-                <p className="text-sm mb-6" style={{ color: 'var(--copy-secondary)' }}>
-                  Search saved successfully.
-                </p>
-                <div className="flex justify-end">
-                  <Button
-                    onPress={() => { setSaveSearchOpen(false); setSaveSearchConfirmed(false) }}
-                    className="titan-btn-primary px-4 py-2 rounded-lg text-sm font-medium"
-                  >
-                    Done
-                  </Button>
-                </div>
-              </>
-            ) : (
-              <>
-                <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--copy-primary)' }}>Name</label>
-                <input
-                  type="text"
-                  value={saveSearchName}
-                  onChange={(e) => setSaveSearchName(e.target.value)}
-                  placeholder="e.g. Fitness US"
-                  className="w-full px-3 py-2.5 border rounded-lg mb-6 focus:outline-none focus-visible:ring-2"
-                  style={{ borderColor: 'var(--input-border)', background: 'var(--surface-0)', color: 'var(--copy-primary)' }}
-                />
-                <div className="flex justify-end gap-2">
-                  <Button
-                    onPress={() => { setSaveSearchOpen(false); setSaveSearchName('') }}
-                    className="titan-btn-secondary px-4 py-2 rounded-lg text-sm font-medium"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    onPress={handleSaveSearch}
-                    isDisabled={!saveSearchName.trim()}
-                    className="titan-btn-primary px-4 py-2 rounded-lg text-sm font-medium"
-                  >
-                    Save
-                  </Button>
-                </div>
-              </>
-            )}
+        <div className="fixed inset-0 z-50 grid place-items-center p-6" role="presentation">
+          <div className="dialog-overlay absolute inset-0" aria-hidden onClick={() => { setSaveSearchOpen(false); setSaveSearchConfirmed(false); setSaveSearchName('') }} />
+          <div className="dialog-modal relative w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+            <div className="dialog-panel">
+              <header className="dialog-header">
+                <h3 className="dialog-title">Save search</h3>
+              </header>
+              {saveSearchConfirmed ? (
+                <>
+                  <div className="dialog-body text-left">
+                    <p className="text-sm">Search saved successfully.</p>
+                  </div>
+                  <footer className="dialog-footer">
+                    <TitanButton variant="secondary" onPress={() => { setSaveSearchOpen(false); setSaveSearchConfirmed(false); setSaveSearchName('') }}>
+                      Close
+                    </TitanButton>
+                    <TitanButton variant="primary" onPress={() => { setSaveSearchOpen(false); setSaveSearchConfirmed(false); setSaveSearchName('') }}>
+                      Done
+                    </TitanButton>
+                  </footer>
+                </>
+              ) : (
+                <>
+                  <div className="dialog-body text-left">
+                    <TitanInputField
+                      label="Name"
+                      placeholder="e.g. Fitness US"
+                      value={saveSearchName}
+                      onChange={setSaveSearchName}
+                    />
+                  </div>
+                  <footer className="dialog-footer">
+                    <TitanButton variant="secondary" onPress={() => { setSaveSearchOpen(false); setSaveSearchName('') }}>
+                      Close
+                    </TitanButton>
+                    <TitanButton variant="primary" onPress={handleSaveSearch} isDisabled={!saveSearchName.trim()}>
+                      Save
+                    </TitanButton>
+                  </footer>
+                </>
+              )}
+            </div>
           </div>
         </div>
       )}
 
-      {/* Modal: Load search — tabla Name, Saved, Criteria, Load */}
+      {/* Dialog: Load search — 100% Titan, sin X, footer Close (secondary) izquierda */}
       {loadSearchOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
-          <div className="absolute inset-0 bg-black/30" aria-hidden onClick={() => setLoadSearchOpen(false)} />
-          <div
-            className="relative rounded-xl shadow-xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden"
-            style={{ background: 'var(--surface-page)', border: '1px solid var(--divider)' }}
-          >
-            <div className="flex items-center justify-between p-6 border-b flex-shrink-0" style={{ borderColor: 'var(--divider)' }}>
-              <h2 className="text-xl font-semibold" style={{ color: 'var(--copy-primary)' }}>Load search</h2>
-              <Button onPress={() => setLoadSearchOpen(false)} className="p-2 rounded-lg" style={{ color: 'var(--copy-secondary)' }} aria-label="Close">
-                <X className="w-5 h-5" />
-              </Button>
-            </div>
-            <div className="flex-1 overflow-auto p-6">
-              <table className="w-full border-collapse" style={{ borderColor: 'var(--divider)' }}>
-                <thead>
-                  <tr>
-                    <th className="text-left py-2 pr-4 font-semibold text-sm" style={{ color: 'var(--copy-primary)' }}>Name</th>
-                    <th className="text-left py-2 pr-4 font-semibold text-sm" style={{ color: 'var(--copy-primary)' }}>Saved</th>
-                    <th className="text-left py-2 pr-4 font-semibold text-sm" style={{ color: 'var(--copy-primary)' }}>Criteria</th>
-                    <th className="text-left py-2 font-semibold text-sm" style={{ color: 'var(--copy-primary)' }}>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {savedSearches.map((item) => (
-                    <tr key={item.id} className="border-b" style={{ borderColor: 'var(--divider)' }}>
-                      <td className="py-3 pr-4 text-sm" style={{ color: 'var(--copy-primary)' }}>{item.name}</td>
-                      <td className="py-3 pr-4 text-sm" style={{ color: 'var(--copy-secondary)' }}>{formatSavedDate(item.createdAt)}</td>
-                      <td className="py-3 pr-4 text-sm max-w-[200px] truncate" style={{ color: 'var(--copy-secondary)' }} title={item.summary}>{item.summary}</td>
-                      <td className="py-3">
-                        <Button
-                          onPress={() => handleLoadSearch(item)}
-                          className="text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 rounded"
-                          style={{ color: 'var(--link-color, var(--button-primary))' }}
-                        >
-                          Load
-                        </Button>
-                      </td>
+        <div className="fixed inset-0 z-50 grid place-items-center p-6" role="presentation">
+          <div className="dialog-overlay absolute inset-0" aria-hidden onClick={() => setLoadSearchOpen(false)} />
+          <div className="dialog-modal relative w-full max-w-2xl max-h-[85vh]" onClick={(e) => e.stopPropagation()}>
+            <div className="dialog-panel flex flex-col max-h-full overflow-hidden">
+              <header className="dialog-header">
+                <h3 className="dialog-title">Load search</h3>
+              </header>
+              <div className="dialog-body flex-1 overflow-auto text-left min-h-0">
+                <table className="w-full border-collapse" style={{ borderColor: 'var(--table-border-bottom)' }}>
+                  <thead>
+                    <tr>
+                      <th className="text-left py-2 pr-4 font-semibold text-sm" style={{ color: 'var(--dialog-body-slot-color)' }}>Name</th>
+                      <th className="text-left py-2 pr-4 font-semibold text-sm" style={{ color: 'var(--dialog-body-slot-color)' }}>Saved</th>
+                      <th className="text-left py-2 pr-4 font-semibold text-sm" style={{ color: 'var(--dialog-body-slot-color)' }}>Criteria</th>
+                      <th className="text-left py-2 font-semibold text-sm" style={{ color: 'var(--dialog-body-slot-color)' }}>Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {savedSearches.map((item) => (
+                      <tr key={item.id} className="border-b" style={{ borderColor: 'var(--table-border-bottom)' }}>
+                        <td className="py-3 pr-4 text-sm" style={{ color: 'var(--dialog-body-slot-color)' }}>{item.name}</td>
+                        <td className="py-3 pr-4 text-sm" style={{ color: 'var(--copy-slot-secondary)' }}>{formatSavedDate(item.createdAt)}</td>
+                        <td className="py-3 pr-4 text-sm max-w-[200px] truncate" style={{ color: 'var(--copy-slot-secondary)' }} title={item.summary}>{item.summary}</td>
+                        <td className="py-3">
+                          <TitanButton variant="tertiary" onPress={() => handleLoadSearch(item)}>
+                            Load
+                          </TitanButton>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <footer className="dialog-footer flex-shrink-0">
+                <TitanButton variant="secondary" onPress={() => setLoadSearchOpen(false)}>
+                  Close
+                </TitanButton>
+              </footer>
             </div>
           </div>
         </div>
       )}
 
-      {/* Success overlay (campaign created / users added) */}
+      {/* Success dialog — Titan: header (título) + body (subtitle + ilustración) + footer (Done centrado); espaciado con tokens */}
       {success && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-6">
-          <div className="absolute inset-0 bg-black/30" aria-hidden onClick={() => setSuccess(null)} />
-          <div className="relative bg-white rounded-2xl shadow-xl max-w-sm w-full p-8 text-center">
-            <button type="button" onClick={() => setSuccess(null)} className="absolute top-4 right-4 p-2 text-gray-500 hover:text-gray-700 rounded-lg" aria-label="Close">
-              <X className="w-5 h-5" />
-            </button>
-            <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
-              <Check className="w-8 h-8 text-green-600" />
+        <div className="fixed inset-0 z-[60] grid place-items-center p-6" role="presentation">
+          <div className="dialog-overlay absolute inset-0" aria-hidden onClick={() => setSuccess(null)} />
+          <div className="dialog-modal relative w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
+            <div className="dialog-panel">
+              <header className="dialog-header">
+                <h3 className="dialog-title">
+                  {success.type === 'created' ? `Campaign "${success.name}" created!` : 'Users added to campaign successfully!'}
+                </h3>
+              </header>
+              <div className="dialog-body" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--spacing-m)' }}>
+                {success.type === 'added' && (
+                  <p style={{ margin: 0, fontSize: 'var(--font-size-s)', lineHeight: 'var(--font-leading-s)', color: 'var(--copy-slot-secondary)' }}>
+                    The selected creators have been added to the campaign.
+                  </p>
+                )}
+                <img
+                  src={`${baseUrl}campaign-success.png`}
+                  alt=""
+                  style={{ maxWidth: '200px', width: '100%', objectFit: 'contain', display: 'block' }}
+                />
+              </div>
+              <footer className="dialog-footer success-dialog-footer">
+                <TitanButton variant="primary" onPress={() => setSuccess(null)}>
+                  Done
+                </TitanButton>
+              </footer>
             </div>
-            <p className="text-lg font-semibold text-gray-900 mb-2">
-              {success.type === 'created' ? `Campaign "${success.name}" created!` : 'Users added to campaign successfully!'}
-            </p>
-            {success.type === 'added' && (
-              <p className="text-sm text-gray-600 mb-4">The selected creators have been added to the campaign.</p>
-            )}
-            <img src={`${baseUrl}campaign-success.png`} alt="" className="w-full max-w-[200px] mx-auto object-contain mb-6" />
-            <Button
-              onPress={() => setSuccess(null)}
-              className="w-full px-4 py-2.5 rounded-lg text-sm font-semibold text-white"
-              style={{ background: 'var(--button-primary)' }}
-            >
-              Done
-            </Button>
           </div>
         </div>
       )}

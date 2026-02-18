@@ -1,6 +1,8 @@
 import { useState } from 'react'
-import { ArrowLeft, ArrowRight, User } from 'lucide-react'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { TitanButton, TitanIconButton } from 'titan-compositions'
 import { MethodCard } from './MethodCard'
+import { ConnectedAccountBox } from './ConnectedAccountBox'
 
 export type TikTokMethodId = 'campaign' | 'brand-mentions'
 
@@ -29,57 +31,44 @@ export function ChooseTikTokMethod({ onBack, onNext }: ChooseTikTokMethodProps) 
   const handleNext = () => onNext(selectedId)
 
   return (
-    <div className="p-6 flex-1 min-w-0">
-      <div className="max-w-3xl mx-auto">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={onBack}
-              className="p-2 -ml-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100"
-              aria-label="Back"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-            <h1 className="text-2xl font-semibold text-gray-900">Choose TikTok method</h1>
-          </div>
-          <button
-            type="button"
-            onClick={handleNext}
-            className="titan-btn-primary px-5 py-2.5 rounded-lg inline-flex items-center justify-center gap-2"
-          >
-            Next
-            <ArrowRight className="w-4 h-4" strokeWidth={1.5} />
-          </button>
+    <div className="flex-1 flex flex-col min-w-0 overflow-auto w-full">
+      <div
+        className="flex-shrink-0 flex flex-wrap items-center justify-between gap-4 px-6 pt-6 pb-4"
+        style={{ background: 'var(--surface-page)' }}
+      >
+        <div className="flex items-center gap-3 min-w-0">
+          <TitanIconButton variant="ghost" aria-label="Back" onPress={onBack}>
+            <ArrowLeft className="w-5 h-5" strokeWidth={1.5} />
+          </TitanIconButton>
+          <h1 className="text-2xl font-semibold truncate m-0" style={{ color: 'var(--copy-primary)' }}>
+            Choose TikTok method
+          </h1>
         </div>
-
-        {/* Connected Account — misma sección que Creator Search / Brand Mentions */}
-        <div
-          className="flex items-center gap-4 rounded-xl border px-4 py-3 mb-6"
-          style={{ background: 'var(--surface-1)', borderColor: 'var(--divider)' }}
+        <TitanButton
+          variant="primary"
+          onPress={handleNext}
+          className="inline-flex items-center gap-2"
         >
-          <div
-            className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full"
-            style={{ background: 'var(--color-black-100)' }}
-          >
-            <User className="h-5 w-5" style={{ color: 'var(--copy-secondary)' }} strokeWidth={1.5} />
-          </div>
-          <div className="min-w-0">
-            <p className="text-xs font-medium" style={{ color: 'var(--copy-tertiary)' }}>Connected Account:</p>
-            <p className="truncate text-sm font-semibold" style={{ color: 'var(--copy-primary)' }}>@adidas</p>
-          </div>
-        </div>
+          Next
+          <ArrowRight className="w-4 h-4 shrink-0" strokeWidth={1.5} />
+        </TitanButton>
+      </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {methods.map((method) => (
-            <MethodCard
-              key={method.id}
-              title={method.title}
-              description={method.description}
-              selected={selectedId === method.id}
-              onSelect={() => setSelectedId(method.id)}
-            />
-          ))}
+      <div className="flex-1 px-6 py-6 min-w-0" style={{ background: 'var(--surface-page)' }}>
+        <div className="max-w-3xl mx-auto">
+          <ConnectedAccountBox className="mb-6" />
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {methods.map((method) => (
+              <MethodCard
+                key={method.id}
+                title={method.title}
+                description={method.description}
+                selected={selectedId === method.id}
+                onSelect={() => setSelectedId(method.id)}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </div>

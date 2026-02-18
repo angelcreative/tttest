@@ -1,32 +1,41 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
-import { ArrowLeft, Video, MessageCircle, Heart, X, Check, User, RefreshCw } from 'lucide-react'
+import { ArrowLeft, MessageCircle, Heart, RefreshCw, Bookmark } from 'lucide-react'
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from 'react-aria-components'
-import { Button } from 'react-aria-components'
+import { TitanButton, TitanIconButton, TitanInputField } from 'titan-compositions'
 import { generateBrandMentionPosts, brandMentionPosts } from '../data/brandMentions'
 import type { BrandMentionPost } from '../data/brandMentions'
 import { usePexelsVideos } from '../hooks/usePexelsVideos'
 import { CAMPAIGNS_SEED } from '../data/campaigns'
+import { ConnectedAccountBox } from './ConnectedAccountBox'
 
 interface BrandMentionsProps {
   onBack: () => void
 }
 
-/** Placeholder con altura fija para no romper el layout antes de cargar. */
+/** Placeholder con altura fija — Titan (surface, card-radius, copy-slot). */
 function CardPlaceholder() {
   return (
-    <div className="rounded-xl border border-gray-200 bg-gray-50 overflow-hidden flex flex-col animate-pulse" style={{ minHeight: 420 }}>
+    <div
+      className="overflow-hidden flex flex-col animate-pulse"
+      style={{
+        minHeight: 420,
+        background: 'var(--card-background)',
+        border: 'var(--stroke-slot-width) solid var(--card-border)',
+        borderRadius: 'var(--card-radius)',
+      }}
+    >
       <div className="p-3 flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full bg-gray-200" />
+        <div className="w-10 h-10 rounded-full flex-shrink-0" style={{ background: 'var(--surface-1)' }} />
         <div className="flex-1 min-w-0 space-y-2">
-          <div className="h-4 bg-gray-200 rounded w-2/3" />
-          <div className="h-3 bg-gray-200 rounded w-1/2" />
+          <div className="h-4 rounded w-2/3" style={{ background: 'var(--surface-1)' }} />
+          <div className="h-3 rounded w-1/2" style={{ background: 'var(--surface-1)' }} />
         </div>
       </div>
-      <div className="aspect-[9/16] max-h-64 bg-gray-200" />
+      <div className="aspect-[9/16] max-h-64" style={{ background: 'var(--surface-1)' }} />
       <div className="p-3 space-y-2">
-        <div className="h-3 bg-gray-200 rounded w-full" />
-        <div className="h-3 bg-gray-200 rounded w-3/4" />
-        <div className="h-8 bg-gray-200 rounded w-full mt-2" />
+        <div className="h-3 rounded w-full" style={{ background: 'var(--surface-1)' }} />
+        <div className="h-3 rounded w-3/4" style={{ background: 'var(--surface-1)' }} />
+        <div className="h-8 rounded w-full mt-2" style={{ background: 'var(--surface-1)' }} />
       </div>
     </div>
   )
@@ -71,29 +80,34 @@ function MentionCard({
   onSendRequest: () => void
 }) {
   return (
-    <article className="rounded-xl border border-gray-200 bg-white overflow-hidden flex flex-col h-full">
+    <article
+      className="overflow-hidden flex flex-col h-full"
+      style={{
+        background: 'var(--card-background)',
+        border: 'var(--stroke-slot-width) solid var(--card-border)',
+        borderRadius: 'var(--card-radius)',
+        boxShadow: 'var(--card-shadow)',
+      }}
+    >
       <div className="p-3 flex items-center gap-3 flex-nowrap min-w-0">
         <img
           src={post.avatarUrl}
           alt=""
-          className="w-10 h-10 rounded-full object-cover bg-gray-200 flex-shrink-0"
+          className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+          style={{ background: 'var(--surface-1)' }}
           onError={(e) => {
             (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(post.userName)}&size=80&background=dee2e6`
           }}
         />
         <div className="flex-1 min-w-0 overflow-hidden">
-          <div className="flex items-center gap-2 min-w-0">
-            <span className="font-semibold text-gray-900 truncate">{post.userName}</span>
-            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-green-100 text-green-800 text-xs font-medium flex-shrink-0">
-              <Video className="w-3.5 h-3.5" />
-              {post.videoCount}
-            </span>
+          <div className="flex items-center gap-2 min-w-0 flex-wrap">
+            <span className="font-semibold truncate" style={{ color: 'var(--copy-slot-primary)', fontSize: 'var(--font-size-s)' }}>{post.userName}</span>
           </div>
-          <p className="text-sm text-gray-500 truncate">{post.handle}</p>
+          <p className="text-sm truncate" style={{ color: 'var(--copy-slot-secondary)' }}>{post.handle}</p>
         </div>
       </div>
 
-      <div className="relative aspect-[9/16] max-h-64 bg-gray-100">
+      <div className="relative aspect-[9/16] max-h-64" style={{ background: 'var(--surface-1)' }}>
         <video
           src={post.videoUrl}
           className="w-full h-full object-cover"
@@ -102,29 +116,29 @@ function MentionCard({
           poster={post.thumbnailUrl}
           preload="metadata"
         />
-        <span className="absolute bottom-2 left-2 text-xs font-medium text-white drop-shadow bg-black/50 px-2 py-1 rounded pointer-events-none">
+        <span
+          className="absolute bottom-2 left-2 text-xs font-medium px-2 py-1 rounded pointer-events-none"
+          style={{ color: 'var(--copy-slot-primary)', background: 'var(--surface-1)', boxShadow: 'var(--card-shadow)' }}
+        >
           {post.views}
         </span>
       </div>
 
       <div className="p-3 flex flex-col gap-2 flex-1">
-        <p className="text-sm text-gray-700 line-clamp-2">{post.description}</p>
-        <div className="flex items-center gap-4 text-xs text-gray-500">
+        <p className="text-sm line-clamp-2" style={{ color: 'var(--copy-slot-body)' }}>{post.description}</p>
+        <div className="flex items-center gap-4 text-xs" style={{ color: 'var(--copy-slot-secondary)' }}>
           <span className="flex items-center gap-1">
-            <Heart className="w-4 h-4" />
+            <Heart style={{ width: 'var(--icon-size-s)', height: 'var(--icon-size-s)' }} />
             {post.likes} Likes
           </span>
           <span className="flex items-center gap-1">
-            <MessageCircle className="w-4 h-4" />
+            <MessageCircle style={{ width: 'var(--icon-size-s)', height: 'var(--icon-size-s)' }} />
             {post.comments} Comments
           </span>
         </div>
-        <Button
-          onPress={onSendRequest}
-          className="mt-auto w-full py-2.5 text-sm font-semibold rounded-lg titan-btn-secondary justify-center"
-        >
+        <TitanButton variant="secondary" onPress={onSendRequest} className="mt-auto w-full justify-center">
           Send request
-        </Button>
+        </TitanButton>
       </div>
     </article>
   )
@@ -150,17 +164,23 @@ function RequestPermissionDialog({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+        className="absolute inset-0 backdrop-blur-sm"
+        style={{ background: 'var(--overlay-backdrop, rgba(0,0,0,0.4))' }}
         aria-hidden
         onClick={onClose}
       />
       <div
-        className="relative flex w-full max-w-4xl max-h-[90vh] rounded-xl bg-white shadow-xl overflow-hidden"
+        className="relative flex w-full max-w-4xl max-h-[90vh] rounded-xl overflow-hidden"
+        style={{
+          background: 'var(--dialog-background, var(--surface-0))',
+          boxShadow: 'var(--dialog-shadow, var(--elevation-shadow-l))',
+          border: 'var(--stroke-slot-width) solid var(--dialog-border, var(--card-border))',
+        }}
         role="dialog"
         aria-labelledby="request-dialog-title"
       >
-        {/* Izquierda: vídeo (reutiliza caja de video, se reproduce en su misma cajita) */}
-        <div className="flex-shrink-0 w-[min(40%,320px)] min-w-0 bg-gray-900 aspect-[9/16] max-h-[90vh]">
+        {/* Izquierda: vídeo */}
+        <div className="flex-shrink-0 w-[min(40%,320px)] min-w-0 aspect-[9/16] max-h-[90vh]" style={{ background: 'var(--surface-1)' }}>
           <video
             src={post.videoUrl}
             poster={post.thumbnailUrl}
@@ -171,64 +191,59 @@ function RequestPermissionDialog({
           />
         </div>
 
-        {/* Derecha: cabecera + Select campaign + Send request / confirmación en el mismo diálogo */}
+        {/* Derecha: cabecera + Select campaign + Send request / confirmación */}
         <div className="flex-1 flex flex-col min-w-0">
-          <div className="flex items-start gap-3 p-4 border-b border-gray-100 flex-shrink-0">
+          <div className="flex items-start gap-3 p-4 flex-shrink-0" style={{ borderBottom: 'var(--stroke-slot-width) solid var(--divider)' }}>
             <img
               src={post.avatarUrl}
               alt=""
-              className="w-12 h-12 rounded-full object-cover bg-gray-200 flex-shrink-0"
+              className="w-12 h-12 rounded-full object-cover flex-shrink-0"
+              style={{ background: 'var(--surface-1)' }}
               onError={(e) => {
                 (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(post.userName)}&size=96&background=dee2e6`
               }}
             />
             <div className="flex-1 min-w-0">
-              <p className="font-semibold text-gray-900 truncate">{post.userName}</p>
-              <p className="text-sm text-gray-500 truncate">{post.handle}</p>
-              <h2 id="request-dialog-title" className="text-lg font-semibold text-gray-900 mt-1">
+              <p className="font-semibold truncate" style={{ color: 'var(--copy-primary)' }}>{post.userName}</p>
+              <p className="text-sm truncate" style={{ color: 'var(--copy-slot-secondary)' }}>{post.handle}</p>
+              <h2 id="request-dialog-title" className="text-lg font-semibold mt-1" style={{ color: 'var(--copy-primary)' }}>
                 Request permission
               </h2>
             </div>
-            <button
-              type="button"
-              onClick={onClose}
-              className="p-2 -m-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 flex-shrink-0"
-              aria-label="Close"
-            >
-              <X className="w-5 h-5" />
-            </button>
           </div>
 
           <div className="p-4 flex-1 flex flex-col min-h-0 overflow-auto">
             {sent ? (
               <>
                 <div className="flex flex-col items-center text-center py-6 flex-1">
-                  <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4" aria-hidden>
-                    <Check className="w-8 h-8 text-green-600" strokeWidth={2.5} />
-                  </div>
-                  <p className="font-semibold text-lg" style={{ color: 'var(--copy-primary)' }}>Request sent!</p>
-                  <p className="text-sm mt-2" style={{ color: 'var(--copy-secondary)' }}>
+                  <p className="font-semibold text-lg m-0" style={{ color: 'var(--copy-primary)' }}>Request sent!</p>
+                  <p className="text-sm mt-2 m-0" style={{ color: 'var(--copy-secondary)' }}>
                     We&apos;ve notified {post.userName}. You&apos;ll be alerted when they approve the link.
                   </p>
                 </div>
-                <Button
-                  onPress={onClose}
-                  className="w-full py-2.5 rounded-lg text-sm font-semibold flex-shrink-0 titan-btn-primary justify-center"
-                >
-                  Done
-                </Button>
+                <div className="flex-shrink-0 flex justify-center">
+                  <TitanButton variant="primary" onPress={onClose}>
+                    Done
+                  </TitanButton>
+                </div>
               </>
             ) : (
               <>
-                <label htmlFor="request-campaign" className="block text-sm font-medium mb-1.5" style={{ color: 'var(--copy-primary)' }}>
+                <label htmlFor="request-campaign" className="block text-sm font-medium mb-1.5" style={{ color: 'var(--copy-slot-primary)', fontSize: 'var(--font-size-s)' }}>
                   Select campaign
                 </label>
                 <select
                   id="request-campaign"
                   value={campaignId}
                   onChange={(e) => setCampaignId(e.target.value)}
-                  className="w-full px-3 py-2.5 border rounded-lg focus:outline-none focus-visible:ring-2 mb-6"
-                  style={{ borderColor: 'var(--input-border)', background: 'var(--surface-0)', color: 'var(--copy-primary)' }}
+                  className="w-full rounded-[var(--input-slot-radius)] border mb-6 min-h-[var(--input-slot-height)] px-[var(--input-slot-pad-x)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring-color)]"
+                  style={{
+                    borderWidth: 'var(--stroke-slot-width)',
+                    borderColor: 'var(--input-slot-border)',
+                    background: 'var(--input-slot-bg)',
+                    color: 'var(--copy-slot-primary)',
+                    fontSize: 'var(--font-size-s)',
+                  }}
                 >
                   <option value="">Choose a campaign</option>
                   {CAMPAIGNS_SEED.map((c) => (
@@ -236,19 +251,12 @@ function RequestPermissionDialog({
                   ))}
                 </select>
                 <div className="flex gap-3 flex-shrink-0">
-                  <Button
-                    onPress={onClose}
-                    className="flex-1 py-2.5 rounded-lg text-sm font-semibold titan-btn-secondary justify-center"
-                  >
+                  <TitanButton variant="secondary" onPress={onClose} className="flex-1 justify-center">
                     Cancel
-                  </Button>
-                  <Button
-                    onPress={handleSend}
-                    isDisabled={!campaignId}
-                    className="flex-1 py-2.5 rounded-lg text-sm font-semibold titan-btn-primary justify-center"
-                  >
+                  </TitanButton>
+                  <TitanButton variant="primary" onPress={handleSend} isDisabled={!campaignId} className="flex-1 justify-center">
                     Send request
-                  </Button>
+                  </TitanButton>
                 </div>
               </>
             )}
@@ -270,6 +278,9 @@ export function BrandMentions({ onBack }: BrandMentionsProps) {
   const [timePeriod, setTimePeriod] = useState('30')
   const [selectedPost, setSelectedPost] = useState<BrandMentionPost | null>(null)
   const [requestSent, setRequestSent] = useState(false)
+  const [saveSearchOpen, setSaveSearchOpen] = useState(false)
+  const [saveSearchName, setSaveSearchName] = useState('')
+  const [saveSearchConfirmed, setSaveSearchConfirmed] = useState(false)
 
   const openRequestDialog = (post: BrandMentionPost) => {
     setSelectedPost(post)
@@ -285,6 +296,11 @@ export function BrandMentions({ onBack }: BrandMentionsProps) {
     setRequestSent(true)
   }
 
+  const handleSaveSearch = () => {
+    if (!saveSearchName.trim()) return
+    setSaveSearchConfirmed(true)
+  }
+
   const filteredPosts = useMemo(() => {
     return posts.filter((p) => p.source === activeTab)
   }, [posts, activeTab])
@@ -295,80 +311,73 @@ export function BrandMentions({ onBack }: BrandMentionsProps) {
       <div className="flex-shrink-0 px-6 pt-6 pb-4">
         <div className="flex items-center justify-between gap-4 mb-4">
           <div className="flex items-center gap-3 min-w-0">
-            <Button onPress={onBack} className="titan-sidebar-icon-btn shrink-0" aria-label="Back">
-              <ArrowLeft className="w-5 h-5" strokeWidth={1.5} />
-            </Button>
+            <TitanIconButton variant="ghost" aria-label="Back" onPress={onBack} className="shrink-0">
+              <ArrowLeft />
+            </TitanIconButton>
             <div>
               <h1 className="text-2xl font-semibold truncate" style={{ color: 'var(--copy-primary)' }}>Brand mentions</h1>
               <p className="text-sm mt-0.5" style={{ color: 'var(--copy-tertiary)' }}>Discover and monitor videos that mention your brand on TikTok</p>
             </div>
           </div>
+          <TitanButton variant="secondary" icon={<Bookmark />} onPress={() => { setSaveSearchOpen(true); setSaveSearchConfirmed(false); setSaveSearchName('') }} className="flex-shrink-0">
+            Save search
+          </TitanButton>
         </div>
 
-        {/* Connected Account */}
-        <div
-          className="flex items-center gap-4 rounded-xl border px-4 py-3 mb-4"
-          style={{ background: 'var(--surface-1)', borderColor: 'var(--divider)' }}
-        >
-          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full" style={{ background: 'var(--color-black-100)' }}>
-            <User className="h-5 w-5" style={{ color: 'var(--copy-secondary)' }} strokeWidth={1.5} />
-          </div>
-          <div className="min-w-0">
-            <p className="text-xs font-medium" style={{ color: 'var(--copy-tertiary)' }}>Connected Account:</p>
-            <p className="truncate text-sm font-semibold" style={{ color: 'var(--copy-primary)' }}>@adidas</p>
-          </div>
-        </div>
+        {/* Connected Account — componente Titan */}
+        <ConnectedAccountBox className="mb-4" />
       </div>
 
       {/* Tabs + content: takes remaining space and scrolls */}
-      <Tabs selectedKey={activeTab} onSelectionChange={(k) => setActiveTab(k as 'mention' | 'hashtag')} className="flex-1 flex flex-col min-h-0 px-6">
-        <TabList className="titan-tab-list flex-shrink-0">
-          <Tab id="mention" className="titan-tab">
+      <Tabs selectedKey={activeTab} onSelectionChange={(k) => setActiveTab(k as 'mention' | 'hashtag')} className="tabs-root flex-1 flex flex-col min-h-0 px-6" style={{ background: 'transparent' }}>
+        <TabList className="tabs-list flex-shrink-0" style={{ background: 'transparent' }}>
+          <Tab id="mention" className="tab-trigger">
             @ Mentions
           </Tab>
-          <Tab id="hashtag" className="titan-tab">
+          <Tab id="hashtag" className="tab-trigger">
             # Hashtag Mentions
           </Tab>
         </TabList>
 
-        {/* Sort by, Time period, Refresh — spacing respecto a tabs */}
+        {/* Sort by, Time period (select nativo con estilos Titan), Refresh (TitanButton) */}
         <div className="flex flex-wrap items-center gap-4 mb-4 flex-shrink-0">
-            <label className="flex items-center gap-2 text-sm" style={{ color: 'var(--copy-secondary)' }}>
+            <label className="flex items-center gap-2" style={{ fontSize: 'var(--font-size-s)', color: 'var(--copy-slot-secondary)' }}>
               Sort by:
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="px-2 py-1.5 border rounded-lg text-sm focus:outline-none focus-visible:ring-2"
-                style={{ borderColor: 'var(--input-border)', background: 'var(--surface-0)', color: 'var(--copy-primary)' }}
+                aria-label="Sort by"
+                className="select-trigger min-h-[var(--select-slot-button-height)] rounded-[var(--select-slot-button-radius)] border border-[var(--select-slot-button-border)] bg-[var(--select-slot-button-bg)] px-[var(--input-slot-pad-x)] text-[var(--button-slot-font-size)]"
+                style={{ color: 'var(--copy-slot-primary)' }}
               >
                 <option value="recent">Most Recent</option>
                 <option value="views">Most Views</option>
                 <option value="likes">Most Likes</option>
               </select>
             </label>
-            <label className="flex items-center gap-2 text-sm" style={{ color: 'var(--copy-secondary)' }}>
+            <label className="flex items-center gap-2" style={{ fontSize: 'var(--font-size-s)', color: 'var(--copy-slot-secondary)' }}>
               Time period:
               <select
                 value={timePeriod}
                 onChange={(e) => setTimePeriod(e.target.value)}
-                className="px-2 py-1.5 border rounded-lg text-sm focus:outline-none focus-visible:ring-2"
-                style={{ borderColor: 'var(--input-border)', background: 'var(--surface-0)', color: 'var(--copy-primary)' }}
+                aria-label="Time period"
+                className="select-trigger min-h-[var(--select-slot-button-height)] rounded-[var(--select-slot-button-radius)] border border-[var(--select-slot-button-border)] bg-[var(--select-slot-button-bg)] px-[var(--input-slot-pad-x)] text-[var(--button-slot-font-size)]"
+                style={{ color: 'var(--copy-slot-primary)' }}
               >
                 <option value="7">Last 7 days</option>
                 <option value="30">Last 30 days</option>
                 <option value="90">Last 90 days</option>
               </select>
             </label>
-            <Button onPress={() => {}} className="titan-btn-secondary inline-flex items-center gap-2 text-sm py-1.5 px-3">
-              <RefreshCw className="w-4 h-4" strokeWidth={1.5} />
+            <TitanButton variant="secondary" icon={<RefreshCw />} onPress={() => {}}>
               Refresh
-            </Button>
+            </TitanButton>
           </div>
 
           <TabPanels className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden pb-6">
             <TabPanel id="mention" className="outline-none py-2">
               {error && (
-                <div className="mb-4 p-4 rounded-lg text-sm" style={{ background: 'var(--color-amber-100)', border: '1px solid var(--color-amber-300)', color: 'var(--color-amber-800)' }}>{error}</div>
+                <div className="mb-4 p-4 rounded-lg text-sm" style={{ background: 'var(--surface-1)', border: 'var(--stroke-slot-width) solid var(--card-border)', color: 'var(--copy-slot-primary)' }}>{error}</div>
               )}
               {loading ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -388,7 +397,7 @@ export function BrandMentions({ onBack }: BrandMentionsProps) {
             </TabPanel>
             <TabPanel id="hashtag" className="outline-none py-2">
               {error && (
-                <div className="mb-4 p-4 rounded-lg text-sm" style={{ background: 'var(--color-amber-100)', border: '1px solid var(--color-amber-300)', color: 'var(--color-amber-800)' }}>{error}</div>
+                <div className="mb-4 p-4 rounded-lg text-sm" style={{ background: 'var(--surface-1)', border: 'var(--stroke-slot-width) solid var(--card-border)', color: 'var(--copy-slot-primary)' }}>{error}</div>
               )}
               {loading ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -416,6 +425,41 @@ export function BrandMentions({ onBack }: BrandMentionsProps) {
           onClose={closeRequestDialog}
           onSend={handleRequestSent}
         />
+      )}
+
+      {/* Dialog: Save search — 100% Titan (sin X, footer Close + Save/Done) */}
+      {saveSearchOpen && (
+        <div className="fixed inset-0 z-50 grid place-items-center p-6" role="presentation">
+          <div className="dialog-overlay absolute inset-0" aria-hidden onClick={() => { setSaveSearchOpen(false); setSaveSearchConfirmed(false); setSaveSearchName('') }} />
+          <div className="dialog-modal relative w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+            <div className="dialog-panel">
+              <header className="dialog-header">
+                <h3 className="dialog-title">Save search</h3>
+              </header>
+              {saveSearchConfirmed ? (
+                <>
+                  <div className="dialog-body text-left">
+                    <p className="text-sm">Search saved successfully.</p>
+                  </div>
+                  <footer className="dialog-footer">
+                    <TitanButton variant="secondary" onPress={() => { setSaveSearchOpen(false); setSaveSearchConfirmed(false); setSaveSearchName('') }}>Close</TitanButton>
+                    <TitanButton variant="primary" onPress={() => { setSaveSearchOpen(false); setSaveSearchConfirmed(false); setSaveSearchName('') }}>Done</TitanButton>
+                  </footer>
+                </>
+              ) : (
+                <>
+                  <div className="dialog-body text-left">
+                    <TitanInputField label="Name" placeholder="e.g. Brand mentions Q1" value={saveSearchName} onChange={setSaveSearchName} />
+                  </div>
+                  <footer className="dialog-footer">
+                    <TitanButton variant="secondary" onPress={() => { setSaveSearchOpen(false); setSaveSearchName('') }}>Close</TitanButton>
+                    <TitanButton variant="primary" onPress={handleSaveSearch} isDisabled={!saveSearchName.trim()}>Save</TitanButton>
+                  </footer>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
