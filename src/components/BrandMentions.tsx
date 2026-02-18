@@ -7,7 +7,6 @@ import { generateBrandMentionPosts, brandMentionPosts } from '../data/brandMenti
 import type { BrandMentionPost } from '../data/brandMentions'
 import { usePexelsVideos } from '../hooks/usePexelsVideos'
 import { CAMPAIGNS_SEED } from '../data/campaigns'
-import { ConnectedAccountBox } from './ConnectedAccountBox'
 
 interface BrandMentionsProps {
   onBack: () => void
@@ -323,17 +322,15 @@ export function BrandMentions({ onBack }: BrandMentionsProps) {
 
   return (
     <div className="flex-1 flex flex-col min-h-0 min-w-0" style={{ background: 'var(--surface-page)' }}>
-      {/* Tag cuenta conectada sobre el título + header */}
       <div className="flex-shrink-0 px-6 pt-6 pb-4">
-        <ConnectedAccountBox className="mb-3" />
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
             <TitanIconButton variant="ghost" aria-label="Back" onPress={onBack} className="shrink-0">
               <ArrowLeft />
             </TitanIconButton>
             <div>
-              <h1 className="text-2xl font-semibold truncate" style={{ color: 'var(--copy-primary)' }}>Brand mentions</h1>
-              <p className="text-sm mt-0.5" style={{ color: 'var(--copy-tertiary)' }}>Discover and monitor videos that mention your brand on TikTok</p>
+              <h1 className="text-2xl font-semibold truncate" style={{ color: 'var(--copy-primary)' }}>Adidas mentions</h1>
+              <p className="text-sm mt-0.5" style={{ color: 'var(--copy-tertiary)' }}>Discover and monitor videos that mention Adidas on TikTok</p>
             </div>
           </div>
           <TitanButton variant="secondary" icon={<Bookmark />} onPress={() => { setSaveSearchOpen(true); setSaveSearchConfirmed(false); setSaveSearchName('') }} className="flex-shrink-0">
@@ -452,9 +449,12 @@ export function BrandMentions({ onBack }: BrandMentionsProps) {
               <Popover className="select-popover" placement="bottom start">
                 <ListBox className="select-list">
                   {[
-                    { id: '7', label: 'Last 7 days' },
-                    { id: '30', label: 'Last 30 days' },
-                    { id: '90', label: 'Last 90 days' },
+                    { id: '1', label: '1 day' },
+                    { id: '7', label: '7 days' },
+                    { id: '30', label: '30 days' },
+                    { id: '60', label: '60 days' },
+                    { id: '90', label: '90 days' },
+                    { id: 'custom', label: 'Custom' },
                   ].map((option) => (
                     <ListBoxItem key={option.id} id={option.id} className="select-item" textValue={option.label}>
                       <span className="select-item-start"><span>{option.label}</span></span>
@@ -498,7 +498,7 @@ export function BrandMentions({ onBack }: BrandMentionsProps) {
               ) : (
                 <>
                   <div className="dialog-body text-left">
-                    <TitanInputField label="Name" placeholder="e.g. Brand mentions Q1" value={saveSearchName} onChange={setSaveSearchName} />
+                    <TitanInputField label="Name" placeholder="e.g. Adidas mentions Q1" value={saveSearchName} onChange={setSaveSearchName} />
                   </div>
                   <footer className="dialog-footer">
                     <TitanButton variant="secondary" onPress={() => { setSaveSearchOpen(false); setSaveSearchName('') }}>Close</TitanButton>

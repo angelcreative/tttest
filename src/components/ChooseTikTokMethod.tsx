@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { TitanButton, TitanIconButton } from 'titan-compositions'
 import { MethodCard } from './MethodCard'
-import { ConnectedAccountBox } from './ConnectedAccountBox'
 
 export type TikTokMethodId = 'campaign' | 'brand-mentions'
 
@@ -14,7 +13,7 @@ interface ChooseTikTokMethodProps {
 const methods: { id: TikTokMethodId; title: string; description: string }[] = [
   {
     id: 'campaign',
-    title: 'Campaign Collab',
+    title: 'Adidas campaign',
     description:
       'Find creators based on specified criteria to invite to new or existing campaigns.',
   },
@@ -56,8 +55,6 @@ export function ChooseTikTokMethod({ onBack, onNext }: ChooseTikTokMethodProps) 
 
       <div className="flex-1 px-6 py-6 min-w-0" style={{ background: 'var(--surface-page)' }}>
         <div className="max-w-3xl mx-auto">
-          <ConnectedAccountBox className="mb-4" />
-
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {methods.map((method) => (
               <MethodCard

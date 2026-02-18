@@ -5,15 +5,18 @@ import { CreatorSearch } from './components/CreatorSearch'
 import { BrandMentions } from './components/BrandMentions'
 import { ChooseTikTokMethod } from './components/ChooseTikTokMethod'
 import { NetworkSelect } from './components/NetworkSelect'
+import { ReportListHome } from './components/ReportListHome'
 import type { NetworkId } from './data/networks'
 import type { TikTokMethodId } from './components/ChooseTikTokMethod'
 import type { BreadcrumbItem } from './components/Breadcrumb'
+import type { SidebarItemId } from './components/Sidebar'
 
-type MainView = 'creator-discovery' | 'select-network' | 'choose-method' | 'creator-search' | 'brand-mentions'
+type MainView = 'all-reports' | 'creator-discovery' | 'select-network' | 'choose-method' | 'creator-search' | 'brand-mentions'
 
 const VIEW_ORDER: MainView[] = ['creator-discovery', 'select-network', 'choose-method']
 
 const BREADCRUMB_LABELS_BY_VIEW: Record<MainView, { label: string; current?: boolean }[]> = {
+  'all-reports': [{ label: 'All reports', current: true }],
   'creator-discovery': [{ label: 'Home', current: true }],
   'select-network': [{ label: 'Home' }, { label: 'Select your network', current: true }],
   'choose-method': [
@@ -25,7 +28,7 @@ const BREADCRUMB_LABELS_BY_VIEW: Record<MainView, { label: string; current?: boo
     { label: 'Home' },
     { label: 'Select your network' },
     { label: 'Choose TikTok method' },
-    { label: 'Campaign collab', current: true },
+    { label: 'Adidas campaign', current: true },
   ],
   'brand-mentions': [
     { label: 'Home' },
@@ -43,6 +46,18 @@ function getBreadcrumbItems(view: MainView, setView: (v: MainView) => void): Bre
   }))
 }
 
+function viewToSidebarId(view: MainView): SidebarItemId {
+  if (view === 'all-reports') return 'all-reports'
+  return 'creator-discovery'
+}
+
+function sidebarIdToView(id: SidebarItemId): MainView | null {
+  if (id === 'all-reports') return 'all-reports'
+  if (id === 'creator-discovery') return 'creator-discovery'
+  if (id === 'home') return 'creator-discovery'
+  return null
+}
+
 function App() {
   const [view, setView] = useState<MainView>('creator-discovery')
 
@@ -52,9 +67,21 @@ function App() {
   }
 
   const breadcrumbItems = useMemo(() => getBreadcrumbItems(view, setView), [view])
+  const sidebarActiveId = viewToSidebarId(view)
+  const handleSidebarNavigate = (id: SidebarItemId) => {
+    const nextView = sidebarIdToView(id)
+    if (nextView != null) setView(nextView)
+  }
 
   return (
-    <AppLayout breadcrumbItems={breadcrumbItems}>
+    <AppLayout
+      breadcrumbItems={breadcrumbItems}
+      sidebarActiveId={sidebarActiveId}
+      onSidebarNavigate={handleSidebarNavigate}
+    >
+      {view === 'all-reports' && (
+        <ReportListHome onNewReport={() => setView('creator-discovery')} />
+      )}
       {view === 'creator-discovery' && (
         <CreatorDiscoveryHome onFindCreators={() => setView('select-network')} />
       )}

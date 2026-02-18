@@ -255,6 +255,22 @@ body {
   stroke-width: var(--icon-stroke-m, 1.5);
 }
 
+/* New report menu: trigger as primary (Titan tokens) */
+.new-report-menu-wrap .menu-trigger-button {
+  background: var(--button-primary-slot-bg);
+  color: var(--button-primary-slot-label);
+}
+.new-report-menu-wrap .menu-trigger-button:hover,
+.new-report-menu-wrap .menu-trigger-button[data-hovered] {
+  background: var(--button-primary-slot-bg-hover);
+}
+.new-report-menu-wrap .menu-trigger-button[data-pressed] {
+  background: var(--button-primary-slot-bg-active);
+}
+.new-report-menu-wrap .menu-trigger-chevron {
+  color: var(--button-primary-slot-label);
+}
+
 /* Button secondary — Titan compliant */
 .titan-btn-secondary {
   display: inline-flex;

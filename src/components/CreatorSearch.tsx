@@ -7,7 +7,6 @@ import type { CreatorCard as CreatorCardType, CreatorFilterState } from '../data
 import type { SavedSearch, SavedSearchPayload } from '../data/savedSearches'
 import { SAVED_SEARCHES_SEED } from '../data/savedSearches'
 import { usePexelsVideosLoadMore, type PexelsVideoEntry } from '../hooks/usePexelsVideos'
-import { ConnectedAccountBox } from './ConnectedAccountBox'
 
 const PAGE_SIZE = 24
 
@@ -724,14 +723,13 @@ export function CreatorSearch({ onBack }: CreatorSearchProps) {
         className="flex-shrink-0 px-6 pt-6 pb-4"
         style={{ background: 'var(--surface-page)' }}
       >
-        <ConnectedAccountBox className="mb-3" />
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
             <TitanIconButton variant="ghost" aria-label="Back" onPress={onBack} className="shrink-0">
               <ArrowLeft />
             </TitanIconButton>
             <h1 className="text-2xl font-semibold truncate" style={{ color: 'var(--copy-primary)' }}>
-              Campaign collab
+              Adidas campaign
             </h1>
           <div className="ml-2 min-w-0 max-w-[180px]">
             <MenuTrigger>

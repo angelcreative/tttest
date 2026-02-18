@@ -2,7 +2,7 @@ import { Button } from 'react-aria-components'
 import { Home, FileText, Scale, Telescope, LayoutGrid, ChevronLeft, ChevronRight } from 'lucide-react'
 import { TitanIconButton } from 'titan-compositions'
 
-type SidebarItemId = 'home' | 'all-reports' | 'audience-overlap' | 'creator-discovery' | 'more'
+export type SidebarItemId = 'home' | 'all-reports' | 'audience-overlap' | 'creator-discovery' | 'more'
 
 const SIDEBAR_STRUCTURE: Array<
   | { type: 'header'; label: string }
@@ -20,11 +20,11 @@ const SIDEBAR_STRUCTURE: Array<
 interface SidebarProps {
   collapsed?: boolean
   onToggle?: () => void
+  activeId?: SidebarItemId
+  onNavigate?: (id: SidebarItemId) => void
 }
 
-export function Sidebar({ collapsed = true, onToggle }: SidebarProps) {
-  const activeId: SidebarItemId = 'creator-discovery'
-
+export function Sidebar({ collapsed = true, onToggle, activeId = 'creator-discovery', onNavigate }: SidebarProps) {
   return (
     <aside
       className="sidebar"
@@ -55,6 +55,7 @@ export function Sidebar({ collapsed = true, onToggle }: SidebarProps) {
             className="menu-item sidebar-item"
             aria-label={label}
             aria-current={isActive ? 'page' : undefined}
+            onPress={() => onNavigate?.(id)}
           >
             <span className="menu-item-start">
               <span className="menu-item-icon" aria-hidden>
