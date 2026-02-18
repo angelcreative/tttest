@@ -6,8 +6,8 @@ import { networks } from '../data/networks'
 import { AuthDialog } from './AuthDialog'
 import { NetworkCard } from './NetworkCard'
 
-/** Loader: ruta absoluta desde la raíz del sitio (archivo en public/assets/ o public/loader.png) */
-const LOADER_IMG_URL = '/assets/loader-l.gif'
+/** Loader: Titan foundations (CDN) — misma idea que logos externos */
+const LOADER_IMG_URL = 'https://cdn.jsdelivr.net/gh/angelcreative/titan-foundations@main/public/assets/logos/loader-l.gif'
 const LOADING_MS = 400
 
 type Phase = 'cards' | 'loading'
