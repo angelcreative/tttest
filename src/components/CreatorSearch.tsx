@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
 import { Button, MenuTrigger, Menu, MenuItem, Popover, SubmenuTrigger, RadioGroup, Radio, Checkbox, Select, Label as SelectLabel, SelectValue, ListBox, ListBoxItem } from 'react-aria-components'
-import { ArrowLeft, Plus, X, User, Globe, TrendingUp, ChevronRight, ChevronDown, Check, Pencil, Bookmark, FolderOpen, MoreVertical, Search } from 'lucide-react'
+import { ArrowLeft, Plus, X, User, Globe, TrendingUp, ChevronRight, ChevronDown, Check, Pencil, Bookmark, FolderOpen, MoreVertical, Search, Users, UserPlus, Video, Heart, Eye, BarChart2, Shirt, Smile, Smartphone, DollarSign } from 'lucide-react'
 import { TitanButton, TitanIconButton, TitanInputField, TitanPagination, TitanTag, TitanTextareaField } from 'titan-compositions'
 import { getCreatorSearchResults } from '../data/creatorSearch'
 import type { CreatorCard as CreatorCardType, CreatorFilterState } from '../data/creatorSearch'
@@ -218,8 +218,26 @@ function CreatorDetailVideosContent({
   )
 }
 
-/** Dialog Titan: Creator insights. Sin X en header; footer con Close (secondary) y Load more (primary). */
-function CreatorInsightsDialog({
+// Datos extendidos para Creator insights (mock/derivados hasta tener API)
+function getCreatorInsightsExt(creator: CreatorCardType) {
+  const handleBase = creator.handle.replace('@', '')
+  return {
+    creatorId: '712824486752367417',
+    bio: 'Business collabs',
+    email: `${handleBase}4@gmail.com`,
+    following: '46',
+    totalLikes: creator.likes,
+    medianViews: '169.7K',
+    contentLabels: ['Outfits', 'Comedy'] as const,
+    industryLabels: ['Apps', "Men's Clothing"] as const,
+    startingPrice: '$600',
+  }
+}
+
+const STAT_ICON_SIZE = 20
+
+/** Drawer Titan: Creator insights. Header con título + X; body con perfil (ID, Bio, email), Statistics (6), Categories, Pricing, Videos (2 filas × 3 cols) + Load more secondary. */
+function CreatorInsightsDrawer({
   creator,
   onClose,
 }: {
@@ -227,72 +245,181 @@ function CreatorInsightsDialog({
   onClose: () => void
 }) {
   const { videos, loading, error, loadMore, loadingMore, hasMore } = usePexelsVideosLoadMore('lifestyle')
+  const [playingUrl, setPlayingUrl] = useState<string | null>(null)
+  const ext = getCreatorInsightsExt(creator)
+  const videosTwoRows = videos.slice(0, 6) // solo 2 filas × 3 cols
 
   return (
-    <div
-      className="dialog-overlay fixed inset-0 z-50"
-      aria-hidden
-      onClick={onClose}
-    >
-      <div
-        className="dialog-modal"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div
-          className="dialog-panel flex flex-col max-h-[90vh] overflow-hidden"
-        >
-          <header className="dialog-header flex-shrink-0 text-left">
-            <h2 className="dialog-title">Creator insights</h2>
+    <div className="fixed inset-0 z-50 flex justify-end">
+      <div className="drawer-overlay absolute inset-0" aria-hidden onClick={onClose} />
+      <div className="drawer-modal relative flex-shrink-0">
+        <div className="drawer-panel flex flex-col max-h-full overflow-hidden">
+          <header className="drawer-header">
+            <h3 className="drawer-title">Creator insights</h3>
+            <TitanIconButton variant="ghost" className="drawer-close-button shrink-0 flex items-center justify-center" aria-label="Close drawer" onPress={onClose}>
+              <X />
+            </TitanIconButton>
           </header>
-          <div className="dialog-body flex-1 overflow-auto text-left min-h-0 space-y-6">
-            <div className="rounded-xl border p-4 flex gap-4" style={{ borderColor: 'var(--divider)', background: 'var(--surface-0)' }}>
-              <img
-                src={creator.avatarUrl}
-                alt=""
-                className="w-14 h-14 rounded-full object-cover flex-shrink-0"
-                style={{ background: 'var(--surface-1)' }}
-              />
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-base m-0" style={{ color: 'var(--copy-primary)' }}>{creator.userName}</p>
-                <p className="text-sm m-0 mt-0.5" style={{ color: 'var(--copy-tertiary)' }}>{creator.handle}</p>
-                <p className="text-sm m-0 mt-0.5" style={{ color: 'var(--copy-tertiary)' }}>{creator.location}</p>
+          <div className="drawer-body flex flex-col min-h-0 p-6 overflow-auto text-left space-y-5">
+            {/* Profile: arriba avatar + handle + Creator ID; abajo Bio + email */}
+            <div className="rounded-xl border px-4 py-3.5 flex flex-col gap-3 flex-shrink-0" style={{ borderColor: 'var(--divider)', background: 'var(--surface-0)' }}>
+              <div className="flex items-center gap-4 min-w-0">
+                <img
+                  src={creator.avatarUrl}
+                  alt=""
+                  className="w-14 h-14 rounded-full object-cover flex-shrink-0"
+                  style={{ background: 'var(--surface-1)' }}
+                />
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-base m-0" style={{ color: 'var(--copy-primary)' }}>{creator.userName}</p>
+                  <p className="text-sm m-0 mt-0.5" style={{ color: 'var(--copy-tertiary)' }}>{creator.handle}</p>
+                  <p className="text-xs m-0 mt-1 tracking-tight" style={{ color: 'var(--copy-tertiary)' }}>Creator ID: {ext.creatorId}</p>
+                </div>
+              </div>
+              <div className="border-t pt-3 min-w-0" style={{ borderColor: 'var(--divider)' }}>
+                <p className="text-xs font-medium m-0 mb-0.5" style={{ color: 'var(--copy-tertiary)' }}>Bio</p>
+                <p className="text-sm m-0" style={{ color: 'var(--copy-primary)' }}>{ext.bio}</p>
+                <p className="text-sm m-0 mt-1 break-all" style={{ color: 'var(--copy-tertiary)' }}>{ext.email}</p>
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-4 text-center">
-              <div>
-                <p className="text-lg font-semibold m-0" style={{ color: 'var(--copy-primary)' }}>{creator.followers}</p>
-                <p className="text-xs m-0" style={{ color: 'var(--copy-tertiary)' }}>Followers</p>
-              </div>
-              <div>
-                <p className="text-lg font-semibold m-0" style={{ color: 'var(--copy-primary)' }}>{creator.engagement}</p>
-                <p className="text-xs m-0" style={{ color: 'var(--copy-tertiary)' }}>Engagement</p>
-              </div>
-              <div>
-                <p className="text-lg font-semibold m-0" style={{ color: 'var(--copy-primary)' }}>{creator.likes}</p>
-                <p className="text-xs m-0" style={{ color: 'var(--copy-tertiary)' }}>Likes</p>
+
+            {/* Statistics: 6 cards with icons */}
+            <div className="flex-shrink-0">
+              <h3 className="text-sm font-medium mb-2 m-0" style={{ color: 'var(--copy-primary)' }}>Statistics</h3>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3" style={{ gap: 'var(--spacing-m)' }}>
+                <div className="rounded-lg border px-3 py-3 flex flex-col items-center text-center" style={{ borderColor: 'var(--divider)', background: 'var(--surface-0)' }}>
+                  <Users className="shrink-0 mb-1.5" size={STAT_ICON_SIZE} style={{ color: 'var(--copy-tertiary)' }} aria-hidden />
+                  <p className="text-sm font-medium m-0 truncate w-full" style={{ color: 'var(--copy-primary)' }}>{creator.followers}</p>
+                  <p className="text-xs m-0 mt-0.5 font-normal normal-case" style={{ color: 'var(--copy-tertiary)' }}>Followers</p>
+                </div>
+                <div className="rounded-lg border px-3 py-3 flex flex-col items-center text-center" style={{ borderColor: 'var(--divider)', background: 'var(--surface-0)' }}>
+                  <UserPlus className="shrink-0 mb-1.5" size={STAT_ICON_SIZE} style={{ color: 'var(--copy-tertiary)' }} aria-hidden />
+                  <p className="text-sm font-medium m-0 truncate w-full" style={{ color: 'var(--copy-primary)' }}>{ext.following}</p>
+                  <p className="text-xs m-0 mt-0.5 font-normal normal-case" style={{ color: 'var(--copy-tertiary)' }}>Following</p>
+                </div>
+                <div className="rounded-lg border px-3 py-3 flex flex-col items-center text-center" style={{ borderColor: 'var(--divider)', background: 'var(--surface-0)' }}>
+                  <Video className="shrink-0 mb-1.5" size={STAT_ICON_SIZE} style={{ color: 'var(--copy-tertiary)' }} aria-hidden />
+                  <p className="text-sm font-medium m-0 truncate w-full" style={{ color: 'var(--copy-primary)' }}>1.7K</p>
+                  <p className="text-xs m-0 mt-0.5 font-normal normal-case" style={{ color: 'var(--copy-tertiary)' }}>Videos</p>
+                </div>
+                <div className="rounded-lg border px-3 py-3 flex flex-col items-center text-center" style={{ borderColor: 'var(--divider)', background: 'var(--surface-0)' }}>
+                  <Heart className="shrink-0 mb-1.5" size={STAT_ICON_SIZE} style={{ color: 'var(--copy-tertiary)' }} aria-hidden />
+                  <p className="text-sm font-medium m-0 truncate w-full" style={{ color: 'var(--copy-primary)' }}>{ext.totalLikes}</p>
+                  <p className="text-xs m-0 mt-0.5 font-normal normal-case" style={{ color: 'var(--copy-tertiary)' }}>Total Likes</p>
+                </div>
+                <div className="rounded-lg border px-3 py-3 flex flex-col items-center text-center" style={{ borderColor: 'var(--divider)', background: 'var(--surface-0)' }}>
+                  <Eye className="shrink-0 mb-1.5" size={STAT_ICON_SIZE} style={{ color: 'var(--copy-tertiary)' }} aria-hidden />
+                  <p className="text-sm font-medium m-0 truncate w-full" style={{ color: 'var(--copy-primary)' }}>{ext.medianViews}</p>
+                  <p className="text-xs m-0 mt-0.5 font-normal normal-case" style={{ color: 'var(--copy-tertiary)' }}>Median Views</p>
+                </div>
+                <div className="rounded-lg border px-3 py-3 flex flex-col items-center text-center" style={{ borderColor: 'var(--divider)', background: 'var(--surface-0)' }}>
+                  <BarChart2 className="shrink-0 mb-1.5" size={STAT_ICON_SIZE} style={{ color: 'var(--copy-tertiary)' }} aria-hidden />
+                  <p className="text-sm font-medium m-0 truncate w-full" style={{ color: 'var(--copy-primary)' }}>{creator.engagement}</p>
+                  <p className="text-xs m-0 mt-0.5 font-normal normal-case" style={{ color: 'var(--copy-tertiary)' }}>Engagement Rate</p>
+                </div>
               </div>
             </div>
-            <div>
-              <h3 className="text-sm font-semibold mb-3 m-0" style={{ color: 'var(--copy-primary)' }}>Videos</h3>
-              <CreatorDetailVideosContent
-                videos={videos}
-                loading={loading}
-                error={error}
-                loadMore={loadMore}
-                loadingMore={loadingMore}
-                hasMore={hasMore}
-                hideLoadMoreInBody
-              />
+
+            {/* Categories: Content Labels + Industry Labels */}
+            <div className="flex-shrink-0">
+              <h3 className="text-sm font-medium mb-2 m-0" style={{ color: 'var(--copy-primary)' }}>Categories</h3>
+              <div className="space-y-2.5">
+                <div>
+                  <p className="text-xs font-medium mb-1.5 m-0" style={{ color: 'var(--copy-tertiary)' }}>Content Labels</p>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-sm font-normal" style={{ background: 'var(--surface-1)', color: 'var(--copy-secondary)' }}>
+                      <Shirt className="w-3.5 h-3.5 shrink-0" style={{ color: 'var(--copy-tertiary)' }} aria-hidden />
+                      {ext.contentLabels[0]}
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-sm font-normal" style={{ background: 'var(--surface-1)', color: 'var(--copy-secondary)' }}>
+                      <Smile className="w-3.5 h-3.5 shrink-0" style={{ color: 'var(--copy-tertiary)' }} aria-hidden />
+                      {ext.contentLabels[1]}
+                    </span>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-xs font-medium mb-1.5 m-0" style={{ color: 'var(--copy-tertiary)' }}>Industry Labels</p>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-sm font-normal" style={{ background: 'var(--surface-1)', color: 'var(--copy-secondary)' }}>
+                      <Smartphone className="w-3.5 h-3.5 shrink-0" style={{ color: 'var(--copy-tertiary)' }} aria-hidden />
+                      {ext.industryLabels[0]}
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-sm font-normal" style={{ background: 'var(--surface-1)', color: 'var(--copy-secondary)' }}>
+                      <Shirt className="w-3.5 h-3.5 shrink-0" style={{ color: 'var(--copy-tertiary)' }} aria-hidden />
+                      {ext.industryLabels[1]}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Pricing Information */}
+            <div className="flex-shrink-0">
+              <h3 className="text-sm font-medium mb-2 m-0" style={{ color: 'var(--copy-primary)' }}>Pricing Information</h3>
+              <div className="rounded-lg border px-4 py-3 flex items-center gap-3" style={{ borderColor: 'var(--divider)', background: 'var(--surface-0)' }}>
+                <DollarSign className="w-5 h-5 shrink-0" style={{ color: 'var(--copy-tertiary)' }} aria-hidden />
+                <div>
+                  <p className="text-xs font-normal m-0 normal-case" style={{ color: 'var(--copy-tertiary)' }}>Starting Price</p>
+                  <p className="text-xl font-semibold m-0 mt-0.5 tracking-tight" style={{ color: 'var(--status-positive, #16a34a)' }}>{ext.startingPrice}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Videos: solo 2 filas × 3 cols + Load more secondary */}
+            <div className="flex-shrink-0">
+              <h3 className="text-sm font-medium mb-2 m-0" style={{ color: 'var(--copy-primary)' }}>Videos</h3>
+              {loading ? (
+                <div className="grid grid-cols-3 gap-3" style={{ gap: 'var(--spacing-m)' }}>
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <div key={i} className="aspect-video rounded-lg animate-pulse" style={{ background: 'var(--surface-1)' }} />
+                  ))}
+                </div>
+              ) : error || videos.length === 0 ? (
+                <p className="text-sm py-4 m-0" style={{ color: 'var(--copy-tertiary)' }}>
+                  {error ?? 'No videos available.'}
+                </p>
+              ) : (
+                <>
+                  {playingUrl && (
+                    <div className="rounded-lg overflow-hidden border mb-4" style={{ borderColor: 'var(--divider)', background: 'var(--surface-0)' }}>
+                      <video src={playingUrl} controls autoPlay className="w-full aspect-video" />
+                      <div className="p-2 flex justify-end">
+                        <TitanButton variant="secondary" onPress={() => setPlayingUrl(null)}>
+                          Close video
+                        </TitanButton>
+                      </div>
+                    </div>
+                  )}
+                  <div className="grid grid-cols-3 gap-3" style={{ gap: 'var(--spacing-m)', gridTemplateRows: 'repeat(2, 1fr)' }}>
+                    {videosTwoRows.map((v, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => setPlayingUrl(v.videoUrl)}
+                        className="relative aspect-video rounded-lg overflow-hidden border cursor-pointer group text-left w-full"
+                        style={{ borderColor: 'var(--divider)' }}
+                      >
+                        <img src={v.thumbnailUrl} alt="" className="w-full h-full object-cover" />
+                        <span className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity" style={{ background: 'var(--overlay-backdrop)' }}>
+                          <span className="w-12 h-12 rounded-full flex items-center justify-center" style={{ background: 'var(--surface-0)' }}>
+                            <ChevronRight className="w-6 h-6 ml-0.5" style={{ color: 'var(--copy-primary)' }} strokeWidth={2} />
+                          </span>
+                        </span>
+                        <span className="absolute top-2 right-2 p-1 rounded" style={{ background: 'var(--surface-0)' }}>
+                          <MoreVertical className="w-4 h-4" style={{ color: 'var(--copy-primary)' }} strokeWidth={1.5} />
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                  <div className="mt-4">
+                    <TitanButton variant="secondary" onPress={loadMore} isDisabled={!hasMore || loadingMore}>
+                      {loadingMore ? 'Loading…' : 'Load more'}
+                    </TitanButton>
+                  </div>
+                </>
+              )}
             </div>
           </div>
-          <footer className="dialog-footer flex-shrink-0 pt-4">
-            <TitanButton variant="secondary" onPress={onClose}>
-              Close
-            </TitanButton>
-            <TitanButton variant="primary" onPress={loadMore} isDisabled={!hasMore || loadingMore}>
-              {loadingMore ? 'Loading…' : 'Load more'}
-            </TitanButton>
-          </footer>
         </div>
       </div>
     </div>
@@ -801,7 +928,7 @@ export function CreatorSearch({ onBack }: CreatorSearchProps) {
       </div>
 
       {/* Fila: columna FAB fija 72px + contenido (menú en cascada Titan compliant) */}
-      <div className="flex-1 flex min-h-0 min-w-0 px-6 pb-6 overflow-hidden w-full">
+      <div className="flex-1 flex min-h-0 min-w-0 pb-6 overflow-hidden w-full" style={{ paddingInline: 'var(--spacing-m)' }}>
         <div className="flex-shrink-0 w-[72px] min-w-[72px] pt-4 relative">
           <MenuTrigger>
             <Button
@@ -871,7 +998,7 @@ export function CreatorSearch({ onBack }: CreatorSearchProps) {
         </div>
 
         {/* Zona de contenido: ancho fijo, nunca se desplaza al abrir el menú FAB */}
-        <div className="flex-1 min-w-0 pt-4 overflow-auto pl-4">
+        <div className="flex-1 min-w-0 pt-4 overflow-auto">
           <div className="w-full min-w-0">
         {/* Pills de filtros activos */}
         {activeFilters.length > 0 && (
@@ -900,7 +1027,10 @@ export function CreatorSearch({ onBack }: CreatorSearchProps) {
           </div>
         ) : creatorResults.length > 0 ? (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
+            <div
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mb-8"
+              style={{ columnGap: 'var(--spacing-m)', rowGap: 'var(--spacing-m)' }}
+            >
               {paginatedResults.map((creator) => (
                 <LazyCreatorCard key={creator.id} fallback={<CardPlaceholder />}>
                   <CreatorCard
@@ -1391,9 +1521,9 @@ export function CreatorSearch({ onBack }: CreatorSearchProps) {
         </div>
       )}
 
-      {/* Dialog Titan: Creator insights — sin X; footer Close (secondary) + Load more (primary) */}
+      {/* Drawer: Creator insights — título + X; body perfil, stats, videos (2 filas) + Load more (secondary) */}
       {insightsCreator && (
-        <CreatorInsightsDialog creator={insightsCreator} onClose={() => setInsightsCreator(null)} />
+        <CreatorInsightsDrawer creator={insightsCreator} onClose={() => setInsightsCreator(null)} />
       )}
 
       {/* Drawer: New campaign — 100% Titan (shell = overlay + modal + panel; drawer-close-button; form = drawer-body) */}

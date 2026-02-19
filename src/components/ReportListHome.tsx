@@ -535,7 +535,7 @@ export function ReportListHome({ onNewReport, onReportClick }: ReportListHomePro
                 placement="bottom end"
                 items={NEW_REPORT_MENU_ITEMS}
                 onAction={(id) => {
-                  if (id.startsWith('report-')) onNewReport?.()
+                  if (String(id).includes('creator-discovery')) onNewReport?.()
                 }}
               />
             </div>

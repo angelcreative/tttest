@@ -24,14 +24,7 @@ export function Breadcrumb({ items = DEFAULT_ITEMS }: BreadcrumbProps) {
   }))
 
   return (
-    <div
-      className="flex items-center px-6"
-      style={{
-        paddingTop: 'var(--spacing-m)',
-        paddingBottom: 'var(--spacing-m)',
-        background: 'var(--surface-page)',
-      }}
-    >
+    <div className="flex items-center px-6">
       <TitanBreadcrumb
         items={titanItems}
         currentLabel={last?.label ?? 'Home'}
