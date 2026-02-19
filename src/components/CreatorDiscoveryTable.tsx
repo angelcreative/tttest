@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Trash2 } from 'lucide-react'
+import { Button as AriaButton } from 'react-aria-components'
 import { IconBrandTiktok, IconBrandFacebook, IconBrandInstagram, IconBrandX } from '@tabler/icons-react'
 import { TitanButton, TitanBorderlessTable, TitanIconButton } from 'titan-compositions'
 import type { Campaign } from '../data/campaigns'
@@ -23,9 +24,10 @@ const NETWORK_ICONS: Record<Campaign['network'], NetworkIconComponent> = {
 
 interface CreatorDiscoveryTableProps {
   onNewReport?: () => void
+  onReportClick?: (reportId: string) => void
 }
 
-export function CreatorDiscoveryTable({ onNewReport }: CreatorDiscoveryTableProps) {
+export function CreatorDiscoveryTable({ onNewReport, onReportClick }: CreatorDiscoveryTableProps) {
   const [campaigns, setCampaigns] = useState<Campaign[]>(CAMPAIGNS_SEED)
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
 
@@ -50,9 +52,19 @@ export function CreatorDiscoveryTable({ onNewReport }: CreatorDiscoveryTableProp
         const NetworkIcon = NETWORK_ICONS[row.network as Campaign['network']]
         return (
           <div className="flex flex-col gap-0.5">
-            <span className="font-medium" style={{ color: 'var(--copy-primary)' }}>
-              {row.name}
-            </span>
+            {onReportClick ? (
+              <AriaButton
+                className="outline-none border-0 bg-transparent p-0 text-left font-medium cursor-pointer underline decoration-solid underline-offset-2 hover:no-underline w-fit"
+                style={{ color: 'var(--link-color)' }}
+                onPress={() => onReportClick(String(row.id))}
+              >
+                {row.name}
+              </AriaButton>
+            ) : (
+              <span className="font-medium" style={{ color: 'var(--copy-primary)' }}>
+                {row.name}
+              </span>
+            )}
             <span className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--copy-tertiary)' }}>
               {NetworkIcon && <NetworkIcon className="w-4 h-4 shrink-0" style={{ color: 'var(--copy-secondary)' }} aria-hidden />}
               {NETWORK_LABELS[row.network as Campaign['network']]}

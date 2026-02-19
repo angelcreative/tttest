@@ -170,7 +170,7 @@ function RequestPermissionDialog({
         onClick={onClose}
       />
       <div
-        className="relative flex max-h-[90vh] rounded-xl overflow-hidden"
+        className="relative flex flex-col w-full max-w-md max-h-[90vh] rounded-xl overflow-hidden"
         style={{
           background: 'var(--dialog-background, var(--surface-0))',
           boxShadow: 'var(--dialog-shadow, var(--elevation-shadow-l))',
@@ -179,20 +179,7 @@ function RequestPermissionDialog({
         role="dialog"
         aria-labelledby="request-dialog-title"
       >
-        {/* Izquierda: vídeo */}
-        <div className="flex-shrink-0 w-[min(40%,320px)] min-w-0 aspect-[9/16] max-h-[90vh]" style={{ background: 'var(--surface-1)' }}>
-          <video
-            src={post.videoUrl}
-            poster={post.thumbnailUrl}
-            className="w-full h-full object-cover"
-            playsInline
-            preload="metadata"
-            controls
-          />
-        </div>
-
-        {/* Derecha: ancho justo para el form (cabecera + select + botones) */}
-        <div className="flex flex-col flex-shrink-0" style={{ width: 360 }}>
+        <div className="flex flex-col flex-1 min-h-0">
           <header
             className="flex items-start gap-3 flex-shrink-0"
             style={{
@@ -234,15 +221,15 @@ function RequestPermissionDialog({
                 </div>
               </>
             ) : (
-              <div className="flex flex-col" style={{ maxWidth: 'min(100%, 320px)' }}>
+              <div className="flex flex-col w-full">
                 <Select
-                  className="select-root"
+                  className="select-root w-full"
                   selectedKey={campaignId || '__none'}
                   onSelectionChange={(k) => setCampaignId(k === '__none' || k == null ? '' : String(k))}
                   aria-label="Select campaign"
                 >
                   <Label className="select-label">Select campaign</Label>
-                  <AriaButton className="select-trigger">
+                  <AriaButton className="select-trigger w-full">
                     <SelectValue />
                     <span className="select-trigger-chevron" aria-hidden><ChevronDown /></span>
                   </AriaButton>
@@ -259,7 +246,7 @@ function RequestPermissionDialog({
                     </ListBox>
                   </Popover>
                 </Select>
-                <div className="flex justify-between gap-3 flex-shrink-0" style={{ marginTop: 'var(--spacing-l, 24px)' }}>
+                <div className="flex justify-end gap-3 flex-shrink-0" style={{ marginTop: 'var(--spacing-l, 24px)' }}>
                   <TitanButton variant="secondary" onPress={onClose}>
                     Cancel
                   </TitanButton>
@@ -329,8 +316,8 @@ export function BrandMentions({ onBack }: BrandMentionsProps) {
               <ArrowLeft />
             </TitanIconButton>
             <div>
-              <h1 className="text-2xl font-semibold truncate" style={{ color: 'var(--copy-primary)' }}>Adidas mentions</h1>
-              <p className="text-sm mt-0.5" style={{ color: 'var(--copy-tertiary)' }}>Discover and monitor videos that mention Adidas on TikTok</p>
+              <h1 className="text-2xl font-semibold truncate" style={{ color: 'var(--copy-primary)' }}>Brand mentions: @adidas | #adidas</h1>
+              <p className="text-sm mt-0.5" style={{ color: 'var(--copy-tertiary)' }}>Discover and monitor videos that mention your brand on TikTok</p>
             </div>
           </div>
           <TitanButton variant="secondary" icon={<Bookmark />} onPress={() => { setSaveSearchOpen(true); setSaveSearchConfirmed(false); setSaveSearchName('') }} className="flex-shrink-0">

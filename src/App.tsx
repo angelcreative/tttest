@@ -103,7 +103,10 @@ function App() {
         <AudienceOverlapPage onNewReport={() => setView('creator-discovery')} />
       )}
       {view === 'creator-discovery' && (
-        <CreatorDiscoveryTable onNewReport={() => setView('select-network')} />
+        <CreatorDiscoveryTable
+          onNewReport={() => setView('select-network')}
+          onReportClick={(reportId) => { /* TODO: navigate to report detail */ }}
+        />
       )}
       {view === 'select-network' && (
         <NetworkSelect

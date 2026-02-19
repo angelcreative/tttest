@@ -51,7 +51,7 @@ import type { TitanTableRow, TitanMenuOption } from 'titan-compositions'
 import type { Report, DataSourceType, ReportDataSource } from '../data/reports'
 import { REPORTS_SEED, AUDIENCE_TYPE_OPTIONS } from '../data/reports'
 
-const PAGE_SIZE = 10
+const PAGE_SIZE = 7
 
 /** Shades 200 for avatars (Titan tokens); label = copy default */
 const AVATAR_COLORS_200: string[] = [
@@ -542,7 +542,7 @@ export function ReportListHome({ onNewReport, onReportClick }: ReportListHomePro
           </div>
         </div>
 
-      <div ref={scrollContainerRef} className="flex-1 overflow-auto min-w-0" style={{ background: 'var(--surface-page)', padding: '0 var(--spacing-l) var(--spacing-l)' }}>
+      <div ref={scrollContainerRef} className="flex-1 min-w-0 overflow-x-auto overflow-y-hidden" style={{ background: 'var(--surface-page)', padding: '0 var(--spacing-l) var(--spacing-l)' }}>
         {rows.length === 0 ? (
           <p className="text-center m-0" style={{ color: 'var(--copy-tertiary)', fontSize: 'var(--font-size-s)', lineHeight: 'var(--font-leading-s)', padding: 'var(--spacing-xl) 0' }}>
             No reports match your filters
