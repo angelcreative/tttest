@@ -1,65 +1,79 @@
 import { useMemo, useState } from 'react'
 import { AppLayout } from './layout/AppLayout'
 import { CreatorDiscoveryHome } from './components/CreatorDiscoveryHome'
+import { CreatorDiscoveryTable } from './components/CreatorDiscoveryTable'
 import { CreatorSearch } from './components/CreatorSearch'
 import { BrandMentions } from './components/BrandMentions'
 import { ChooseTikTokMethod } from './components/ChooseTikTokMethod'
 import { NetworkSelect } from './components/NetworkSelect'
 import { ReportListHome } from './components/ReportListHome'
+import { AudienceOverlapPage } from './components/AudienceOverlapPage'
 import type { NetworkId } from './data/networks'
 import type { TikTokMethodId } from './components/ChooseTikTokMethod'
 import type { BreadcrumbItem } from './components/Breadcrumb'
 import type { SidebarItemId } from './components/Sidebar'
 
-type MainView = 'all-reports' | 'creator-discovery' | 'select-network' | 'choose-method' | 'creator-search' | 'brand-mentions'
+type MainView = 'home' | 'all-reports' | 'audience-overlap' | 'creator-discovery' | 'select-network' | 'choose-method' | 'creator-search' | 'brand-mentions'
 
-const VIEW_ORDER: MainView[] = ['creator-discovery', 'select-network', 'choose-method']
+type BreadcrumbRow = { label: string; current?: boolean; navigateToView?: MainView }
 
-const BREADCRUMB_LABELS_BY_VIEW: Record<MainView, { label: string; current?: boolean }[]> = {
+const BREADCRUMB_LABELS_BY_VIEW: Record<MainView, BreadcrumbRow[]> = {
+  'home': [{ label: 'Home', current: true }],
   'all-reports': [{ label: 'All reports', current: true }],
-  'creator-discovery': [{ label: 'Home', current: true }],
-  'select-network': [{ label: 'Home' }, { label: 'Select your network', current: true }],
+  'audience-overlap': [{ label: 'Audience overlap', current: true }],
+  'creator-discovery': [{ label: 'Creator discovery', current: true }],
+  'select-network': [
+    { label: 'Creator discovery', navigateToView: 'creator-discovery' },
+    { label: 'Select your network', current: true },
+  ],
   'choose-method': [
-    { label: 'Home' },
-    { label: 'Select your network' },
+    { label: 'Creator discovery', navigateToView: 'creator-discovery' },
+    { label: 'Select your network', navigateToView: 'select-network' },
     { label: 'Choose TikTok method', current: true },
   ],
   'creator-search': [
-    { label: 'Home' },
-    { label: 'Select your network' },
-    { label: 'Choose TikTok method' },
+    { label: 'Creator discovery', navigateToView: 'creator-discovery' },
+    { label: 'Select your network', navigateToView: 'select-network' },
+    { label: 'Choose TikTok method', navigateToView: 'choose-method' },
     { label: 'Adidas campaign', current: true },
   ],
   'brand-mentions': [
-    { label: 'Home' },
-    { label: 'Select your network' },
-    { label: 'Choose TikTok method' },
+    { label: 'Creator discovery', navigateToView: 'creator-discovery' },
+    { label: 'Select your network', navigateToView: 'select-network' },
+    { label: 'Choose TikTok method', navigateToView: 'choose-method' },
     { label: 'Brand mentions', current: true },
   ],
 }
 
 function getBreadcrumbItems(view: MainView, setView: (v: MainView) => void): BreadcrumbItem[] {
   const rows = BREADCRUMB_LABELS_BY_VIEW[view]
-  return rows.map((row, i) => ({
-    ...row,
-    onPress: row.current ? undefined : () => setView(i < VIEW_ORDER.length ? VIEW_ORDER[i] : view),
+  return rows.map((row) => ({
+    label: row.label,
+    current: row.current,
+    onPress: row.current ? undefined : row.navigateToView != null ? () => setView(row.navigateToView!) : undefined,
   }))
 }
 
 function viewToSidebarId(view: MainView): SidebarItemId {
+  if (view === 'home') return 'home'
   if (view === 'all-reports') return 'all-reports'
-  return 'creator-discovery'
+  if (view === 'audience-overlap') return 'audience-overlap'
+  if (view === 'creator-discovery') return 'creator-discovery'
+  // Creator discovery flow: keep sidebar on Creator discovery
+  if (view === 'select-network' || view === 'choose-method' || view === 'creator-search' || view === 'brand-mentions') return 'creator-discovery'
+  return 'home'
 }
 
 function sidebarIdToView(id: SidebarItemId): MainView | null {
+  if (id === 'home') return 'home'
   if (id === 'all-reports') return 'all-reports'
+  if (id === 'audience-overlap') return 'audience-overlap'
   if (id === 'creator-discovery') return 'creator-discovery'
-  if (id === 'home') return 'creator-discovery'
   return null
 }
 
 function App() {
-  const [view, setView] = useState<MainView>('creator-discovery')
+  const [view, setView] = useState<MainView>('home')
 
   const handleMethodNext = (methodId: TikTokMethodId) => {
     if (methodId === 'campaign') setView('creator-search')
@@ -79,11 +93,17 @@ function App() {
       sidebarActiveId={sidebarActiveId}
       onSidebarNavigate={handleSidebarNavigate}
     >
+      {view === 'home' && (
+        <CreatorDiscoveryHome onFindCreators={() => setView('select-network')} />
+      )}
       {view === 'all-reports' && (
         <ReportListHome onNewReport={() => setView('creator-discovery')} />
       )}
+      {view === 'audience-overlap' && (
+        <AudienceOverlapPage onNewReport={() => setView('creator-discovery')} />
+      )}
       {view === 'creator-discovery' && (
-        <CreatorDiscoveryHome onFindCreators={() => setView('select-network')} />
+        <CreatorDiscoveryTable onNewReport={() => setView('select-network')} />
       )}
       {view === 'select-network' && (
         <NetworkSelect

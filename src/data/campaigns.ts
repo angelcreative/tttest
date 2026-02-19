@@ -34,4 +34,20 @@ export const CAMPAIGNS_SEED: Campaign[] = [
     creatorCount: 5,
     description: '',
   },
+  {
+    id: '4',
+    name: 'Facebook Reach',
+    network: 'facebook',
+    adAccountName: 'Ads Account 1',
+    creatorCount: 20,
+    description: 'Facebook creator campaign',
+  },
+  {
+    id: '5',
+    name: 'Instagram Stories',
+    network: 'instagram',
+    adAccountName: 'Ads Account 2',
+    creatorCount: 15,
+    description: 'Instagram stories collaboration',
+  },
 ]

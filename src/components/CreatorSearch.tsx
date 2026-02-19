@@ -6,7 +6,7 @@ import { getCreatorSearchResults } from '../data/creatorSearch'
 import type { CreatorCard as CreatorCardType, CreatorFilterState } from '../data/creatorSearch'
 import type { SavedSearch, SavedSearchPayload } from '../data/savedSearches'
 import { SAVED_SEARCHES_SEED } from '../data/savedSearches'
-import { usePexelsVideosLoadMore, type PexelsVideoEntry } from '../hooks/usePexelsVideos'
+import { usePexelsVideosLoadMore } from '../hooks/usePexelsVideos'
 
 const PAGE_SIZE = 24
 
@@ -135,86 +135,6 @@ function CreatorCard({
         </TitanButton>
       </div>
     </Button>
-  )
-}
-
-/** Grid de vídeos Pexels (presentacional). Recibe estado para poder poner Load more en footer del dialog. */
-function CreatorDetailVideosContent({
-  videos,
-  loading,
-  error,
-  loadMore,
-  loadingMore,
-  hasMore,
-  hideLoadMoreInBody = false,
-}: {
-  videos: PexelsVideoEntry[]
-  loading: boolean
-  error: string | null
-  loadMore: () => void
-  loadingMore: boolean
-  hasMore: boolean
-  hideLoadMoreInBody?: boolean
-}) {
-  const [playingUrl, setPlayingUrl] = useState<string | null>(null)
-
-  if (loading) {
-    return (
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        {Array.from({ length: 12 }).map((_, i) => (
-          <div key={i} className="aspect-video rounded-lg animate-pulse" style={{ background: 'var(--surface-1)' }} />
-        ))}
-      </div>
-    )
-  }
-  if (error || videos.length === 0) {
-    return (
-      <p className="text-sm py-4 m-0" style={{ color: 'var(--copy-tertiary)' }}>
-        {error ?? 'No videos available.'}
-      </p>
-    )
-  }
-  return (
-    <div className="space-y-4">
-      {playingUrl && (
-        <div className="rounded-lg overflow-hidden border" style={{ borderColor: 'var(--divider)', background: 'var(--surface-0)' }}>
-          <video src={playingUrl} controls autoPlay className="w-full aspect-video" />
-          <div className="p-2 flex justify-end">
-            <TitanButton variant="secondary" onPress={() => setPlayingUrl(null)}>
-              Close video
-            </TitanButton>
-          </div>
-        </div>
-      )}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        {videos.map((v, i) => (
-          <button
-            key={i}
-            type="button"
-            onClick={() => setPlayingUrl(v.videoUrl)}
-            className="relative aspect-video rounded-lg overflow-hidden border cursor-pointer group text-left w-full"
-            style={{ borderColor: 'var(--divider)' }}
-          >
-            <img src={v.thumbnailUrl} alt="" className="w-full h-full object-cover" />
-            <span className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity" style={{ background: 'var(--overlay-backdrop)' }}>
-              <span className="w-12 h-12 rounded-full flex items-center justify-center" style={{ background: 'var(--surface-0)' }}>
-                <ChevronRight className="w-6 h-6 ml-0.5" style={{ color: 'var(--copy-primary)' }} strokeWidth={2} />
-              </span>
-            </span>
-            <span className="absolute top-2 right-2 p-1 rounded" style={{ background: 'var(--surface-0)' }}>
-              <MoreVertical className="w-4 h-4" style={{ color: 'var(--copy-primary)' }} strokeWidth={1.5} />
-            </span>
-          </button>
-        ))}
-      </div>
-      {!hideLoadMoreInBody && hasMore && (
-        <div className="flex justify-center pt-2">
-          <TitanButton variant="secondary" onPress={loadMore} isDisabled={loadingMore}>
-            {loadingMore ? 'Cargando…' : 'Load more'}
-          </TitanButton>
-        </div>
-      )}
-    </div>
   )
 }
 
