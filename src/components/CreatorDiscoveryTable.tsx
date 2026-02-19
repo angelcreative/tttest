@@ -13,11 +13,12 @@ const NETWORK_LABELS: Record<Campaign['network'], string> = {
   x: 'X (Twitter)',
 }
 
-const NETWORK_ICONS: Record<Campaign['network'], React.ComponentType<{ className?: string; size?: number }>> = {
-  tiktok: IconBrandTiktok,
-  facebook: IconBrandFacebook,
-  instagram: IconBrandInstagram,
-  x: IconBrandX,
+type NetworkIconComponent = React.ComponentType<React.SVGAttributes<SVGSVGElement>>
+const NETWORK_ICONS: Record<Campaign['network'], NetworkIconComponent> = {
+  tiktok: IconBrandTiktok as NetworkIconComponent,
+  facebook: IconBrandFacebook as NetworkIconComponent,
+  instagram: IconBrandInstagram as NetworkIconComponent,
+  x: IconBrandX as NetworkIconComponent,
 }
 
 interface CreatorDiscoveryTableProps {

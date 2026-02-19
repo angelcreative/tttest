@@ -13,11 +13,12 @@ const NETWORK_LABELS: Record<AudienceOverlapNetwork, string> = {
   x: 'X (Twitter)',
 }
 
-const NETWORK_ICONS: Record<AudienceOverlapNetwork, React.ComponentType<{ className?: string; size?: number }>> = {
-  tiktok: IconBrandTiktok,
-  facebook: IconBrandFacebook,
-  instagram: IconBrandInstagram,
-  x: IconBrandX,
+type NetworkIconComponent = React.ComponentType<React.SVGAttributes<SVGSVGElement>>
+const NETWORK_ICONS: Record<AudienceOverlapNetwork, NetworkIconComponent> = {
+  tiktok: IconBrandTiktok as NetworkIconComponent,
+  facebook: IconBrandFacebook as NetworkIconComponent,
+  instagram: IconBrandInstagram as NetworkIconComponent,
+  x: IconBrandX as NetworkIconComponent,
 }
 
 interface AudienceOverlapPageProps {

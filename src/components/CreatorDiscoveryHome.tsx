@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Button } from 'react-aria-components'
-import { Info, ArrowRight, ChevronRight, ChevronDown, Zap, Link } from 'lucide-react'
+import { Info, ArrowRight, ChevronDown, Link } from 'lucide-react'
 import {
   IconBrandLinkedin,
   IconBrandX,
@@ -41,6 +41,7 @@ function AppCard({
   return (
     <Button
       onPress={() => onOpen?.()}
+      aria-label={title}
       className="rounded-xl pt-6 px-4 pb-4 flex flex-col min-h-[140px] relative transition-all duration-200 ease-out hover:-translate-y-2 hover:shadow-md cursor-pointer text-left border-0 w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring-color)] focus-visible:ring-offset-2"
       style={{
         border: '8px solid var(--surface-0)',
