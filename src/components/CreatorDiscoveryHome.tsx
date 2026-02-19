@@ -23,8 +23,13 @@ interface AppCardProps {
   logoNode?: React.ReactNode
   accentColor: string
   bgColor: string
+  /** Link opened in new tab when card is clicked. Takes precedence over onOpen. */
+  href?: string
   onOpen?: () => void
 }
+
+const CARD_BASE_CLASS =
+  'rounded-xl pt-6 px-4 pb-4 flex flex-col min-h-[140px] relative transition-all duration-200 ease-out cursor-pointer text-left border-0 w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring-color)] focus-visible:ring-offset-2 active:translate-y-0.5'
 
 function AppCard({
   title,
@@ -36,19 +41,17 @@ function AppCard({
   logoNode,
   accentColor,
   bgColor,
+  href,
   onOpen,
 }: AppCardProps) {
-  return (
-    <Button
-      onPress={() => onOpen?.()}
-      aria-label={title}
-      className="rounded-xl pt-6 px-4 pb-4 flex flex-col min-h-[140px] relative transition-all duration-200 ease-out hover:-translate-y-2 hover:shadow-md cursor-pointer text-left border-0 w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring-color)] focus-visible:ring-offset-2"
-      style={{
-        border: '8px solid var(--surface-0)',
-        background: bgColor,
-        boxShadow: 'var(--elevation-shadow-s, none)',
-      }}
-    >
+  const style = {
+    border: '8px solid var(--surface-0)',
+    background: bgColor,
+    boxShadow: 'none',
+  }
+
+  const content = (
+    <>
       <span
         className="absolute top-4 right-4 shrink-0 flex items-center justify-center"
         style={{ color: 'var(--copy-tertiary)' }}
@@ -117,6 +120,32 @@ function AppCard({
         <span className="text-sm font-medium">Open</span>
         <ArrowRight className="w-4 h-4 shrink-0" strokeWidth={2} aria-hidden />
       </div>
+    </>
+  )
+
+  if (href) {
+    return (
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={title}
+        className={CARD_BASE_CLASS}
+        style={style}
+      >
+        {content}
+      </a>
+    )
+  }
+
+  return (
+    <Button
+      onPress={() => onOpen?.()}
+      aria-label={title}
+      className={CARD_BASE_CLASS}
+      style={style}
+    >
+      {content}
     </Button>
   )
 }
@@ -169,6 +198,7 @@ const MY_APPS: Omit<AppCardProps, 'onOpen'>[] = [
     logoNode: ACTION_LOGO_SVG,
     accentColor: 'var(--color-pomegranate-600, #c53030)',
     bgColor: 'var(--color-pomegranate-100, #fde8e8)',
+    href: 'https://action.audiense.com',
   },
   {
     title: 'Insights',
@@ -187,6 +217,7 @@ const MY_APPS: Omit<AppCardProps, 'onOpen'>[] = [
     logoAlt: 'Insights',
     accentColor: 'var(--color-violet-600, #7c3aed)',
     bgColor: 'var(--color-violet-100, #f5f3ff)',
+    href: 'https://dashboard.audiense.com/app/insights',
   },
   {
     title: 'Digital Intelligence for LinkedIn',
@@ -195,6 +226,7 @@ const MY_APPS: Omit<AppCardProps, 'onOpen'>[] = [
     logoAlt: 'LinkedIn',
     accentColor: 'var(--color-indigo-600, #4f46e5)',
     bgColor: 'var(--color-indigo-100, #eef2ff)',
+    href: 'https://di-linkedin.audiense.com/',
   },
   {
     title: 'Demand',
@@ -209,6 +241,7 @@ const MY_APPS: Omit<AppCardProps, 'onOpen'>[] = [
     logoAlt: 'Demand',
     accentColor: 'var(--color-aquamarine-600, #0d9488)',
     bgColor: 'var(--color-aquamarine-100, #e6fffa)',
+    href: 'https://demand.audiense.com/',
   },
   {
     title: 'Connect',
@@ -218,6 +251,7 @@ const MY_APPS: Omit<AppCardProps, 'onOpen'>[] = [
     logoAlt: 'Connect',
     accentColor: 'var(--color-ocean-600, #0369a1)',
     bgColor: 'var(--color-ocean-100, #e0f2fe)',
+    href: 'https://dashboard.audiense.com/',
   },
   {
     title: 'Tweet Binder',
@@ -227,6 +261,7 @@ const MY_APPS: Omit<AppCardProps, 'onOpen'>[] = [
     logoAlt: 'Tweet Binder',
     accentColor: 'var(--color-ocean-600, #0369a1)',
     bgColor: 'var(--color-ocean-100, #e0f2fe)',
+    href: 'https://www.tweetbinder.com/',
   },
 ]
 
@@ -234,7 +269,7 @@ interface CreatorDiscoveryHomeProps {
   onFindCreators?: () => void
 }
 
-export function CreatorDiscoveryHome({ onFindCreators }: CreatorDiscoveryHomeProps) {
+export function CreatorDiscoveryHome({ onFindCreators: _onFindCreators }: CreatorDiscoveryHomeProps) {
   const [otherAppsOpen, setOtherAppsOpen] = useState(false)
 
   return (
@@ -257,12 +292,8 @@ export function CreatorDiscoveryHome({ onFindCreators }: CreatorDiscoveryHomePro
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4"
             style={{ gap: 'var(--spacing-m)' }}
           >
-            {MY_APPS.map((app, i) => (
-              <AppCard
-                key={app.title}
-                {...app}
-                onOpen={i === 4 ? onFindCreators : undefined}
-              />
+            {MY_APPS.map((app) => (
+              <AppCard key={app.title} {...app} />
             ))}
           </div>
         </section>
@@ -312,6 +343,7 @@ export function CreatorDiscoveryHome({ onFindCreators }: CreatorDiscoveryHomePro
                   connections={['MCP', 'Elevar', 'Meta Custom Audiences']}
                   accentColor="var(--color-pomegranate-600, #c53030)"
                   bgColor="var(--color-pomegranate-100, #fde8e8)"
+                  href="https://www.soprism.com/"
                 />
               </div>
               <p className="text-sm m-0" style={{ color: 'var(--copy-tertiary)' }}>
