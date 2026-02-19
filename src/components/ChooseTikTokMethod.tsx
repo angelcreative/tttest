@@ -10,10 +10,12 @@ interface ChooseTikTokMethodProps {
   onNext: (methodId: TikTokMethodId) => void
 }
 
+const ADIDAS_LOGO_URL = 'https://pbs.twimg.com/profile_images/1696070215354716160/3GW_BOtL_400x400.jpg'
+
 const methods: { id: TikTokMethodId; title: string; description: string }[] = [
   {
     id: 'campaign',
-    title: 'Adidas campaign',
+    title: 'Collab campaign',
     description:
       'Find creators based on specified criteria to invite to new or existing campaigns.',
   },
@@ -54,7 +56,28 @@ export function ChooseTikTokMethod({ onBack, onNext }: ChooseTikTokMethodProps) 
       </div>
 
       <div className="flex-1 px-6 py-6 min-w-0" style={{ background: 'var(--surface-page)' }}>
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-3xl mx-auto flex flex-col" style={{ gap: 'var(--spacing-m)' }}>
+          <div
+            className="flex items-center justify-center shrink-0"
+            style={{
+              gap: 'var(--spacing-s)',
+              padding: 'var(--spacing-s) var(--spacing-m)',
+              background: 'var(--surface-0)',
+              border: '1px solid var(--card-border, var(--surface-1))',
+              borderRadius: 'var(--radius-card)',
+            }}
+            role="status"
+            aria-label="Connected account @adidas"
+          >
+            <img
+              src={ADIDAS_LOGO_URL}
+              alt=""
+              className="w-8 h-8 rounded-full object-cover shrink-0"
+            />
+            <span className="text-sm font-medium" style={{ color: 'var(--copy-primary)' }}>
+              @adidas connected
+            </span>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {methods.map((method) => (
               <MethodCard

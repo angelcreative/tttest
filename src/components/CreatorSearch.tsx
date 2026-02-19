@@ -776,7 +776,7 @@ export function CreatorSearch({ onBack }: CreatorSearchProps) {
               <ArrowLeft />
             </TitanIconButton>
             <h1 className="text-2xl font-semibold truncate" style={{ color: 'var(--copy-primary)' }}>
-              Adidas campaign
+              Collab campaign
             </h1>
           <div className="ml-2 min-w-0 max-w-[180px]">
             <MenuTrigger>
@@ -948,7 +948,7 @@ export function CreatorSearch({ onBack }: CreatorSearchProps) {
         ) : creatorResults.length > 0 ? (
           <>
             <div
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mb-8"
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 mb-8"
               style={{ columnGap: 'var(--spacing-m)', rowGap: 'var(--spacing-m)' }}
             >
               {paginatedResults.map((creator) => (

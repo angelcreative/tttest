@@ -35,7 +35,7 @@ const BREADCRUMB_LABELS_BY_VIEW: Record<MainView, BreadcrumbRow[]> = {
     { label: 'Creator discovery', navigateToView: 'creator-discovery' },
     { label: 'Select your network', navigateToView: 'select-network' },
     { label: 'Choose TikTok method', navigateToView: 'choose-method' },
-    { label: 'Adidas campaign', current: true },
+    { label: 'Collab campaign', current: true },
   ],
   'brand-mentions': [
     { label: 'Creator discovery', navigateToView: 'creator-discovery' },

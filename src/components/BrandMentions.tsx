@@ -366,13 +366,13 @@ export function BrandMentions({ onBack }: BrandMentionsProps) {
                 <div className="mb-4 p-4 rounded-lg text-sm" style={{ background: 'var(--surface-1)', border: 'var(--stroke-slot-width) solid var(--card-border)', color: 'var(--copy-slot-primary)' }}>{error}</div>
               )}
               {loading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4" style={{ columnGap: 'var(--spacing-s)', rowGap: 'var(--spacing-m)' }}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5" style={{ columnGap: 'var(--spacing-s)', rowGap: 'var(--spacing-m)' }}>
                   {Array.from({ length: 12 }).map((_, i) => (
                     <CardPlaceholder key={i} />
                   ))}
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4" style={{ columnGap: 'var(--spacing-s)', rowGap: 'var(--spacing-m)' }}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5" style={{ columnGap: 'var(--spacing-s)', rowGap: 'var(--spacing-m)' }}>
                   {filteredPosts.map((post) => (
                     <LazyCard key={post.id} fallback={<CardPlaceholder />}>
                       <MentionCard post={post} onSendRequest={() => openRequestDialog(post)} />
@@ -386,13 +386,13 @@ export function BrandMentions({ onBack }: BrandMentionsProps) {
                 <div className="mb-4 p-4 rounded-lg text-sm" style={{ background: 'var(--surface-1)', border: 'var(--stroke-slot-width) solid var(--card-border)', color: 'var(--copy-slot-primary)' }}>{error}</div>
               )}
               {loading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4" style={{ columnGap: 'var(--spacing-s)', rowGap: 'var(--spacing-m)' }}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5" style={{ columnGap: 'var(--spacing-s)', rowGap: 'var(--spacing-m)' }}>
                   {Array.from({ length: 12 }).map((_, i) => (
                     <CardPlaceholder key={i} />
                   ))}
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4" style={{ columnGap: 'var(--spacing-s)', rowGap: 'var(--spacing-m)' }}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5" style={{ columnGap: 'var(--spacing-s)', rowGap: 'var(--spacing-m)' }}>
                   {filteredPosts.map((post) => (
                     <LazyCard key={post.id} fallback={<CardPlaceholder />}>
                       <MentionCard post={post} onSendRequest={() => openRequestDialog(post)} />

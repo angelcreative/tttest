@@ -1,5 +1,9 @@
 import { ModalOverlay, Modal, Dialog } from 'react-aria-components'
+import { ArrowLeftRight } from 'lucide-react'
 import { TitanButton } from 'titan-compositions'
+
+const ADIDAS_LOGO_URL = 'https://pbs.twimg.com/profile_images/1696070215354716160/3GW_BOtL_400x400.jpg'
+const AUDIENSE_RING_LOGO_URL = 'https://pbs.twimg.com/profile_images/1950145815193714688/KQDVFYL9_400x400.jpg'
 
 interface AuthDialogProps {
   networkName: string
@@ -42,29 +46,27 @@ export function AuthDialog({ networkName, onClose, onAuthorize }: AuthDialogProp
               Authorize Audiense to access your {networkName} account?
             </h2>
 
-            <div className="flex items-center gap-4">
-              <div className="flex flex-col items-center gap-1">
-                <div
-                  className="w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold"
-                  style={{ background: 'var(--surface-elevated)', color: 'var(--copy-primary)' }}
-                >
-                  adidas
-                </div>
-                <span className="text-xs" style={{ color: 'var(--copy-tertiary)' }}>Adidas</span>
+            <div
+              className="flex items-center justify-center"
+              style={{ gap: 'var(--spacing-m)' }}
+            >
+              <div className="flex flex-col items-center gap-1 shrink-0">
+                <img
+                  src={ADIDAS_LOGO_URL}
+                  alt="Your brand"
+                  className="w-12 h-12 rounded-full object-cover"
+                />
                 <span className="text-xs" style={{ color: 'var(--copy-tertiary)' }}>Your brand</span>
               </div>
-              <div className="flex-1 flex justify-center" aria-hidden>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: 'var(--copy-secondary)' }}>
-                  <path d="M7 17L17 7M17 7h-6M17 7v6" />
-                </svg>
+              <div className="flex items-center justify-center shrink-0" style={{ color: 'var(--copy-secondary)' }} aria-hidden>
+                <ArrowLeftRight className="w-6 h-6" strokeWidth={2} />
               </div>
-              <div className="flex flex-col items-center gap-1">
-                <div
-                  className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm"
-                  style={{ background: 'var(--button-primary)', color: 'var(--button-primary-label)' }}
-                >
-                  A
-                </div>
+              <div className="flex flex-col items-center gap-1 shrink-0">
+                <img
+                  src={AUDIENSE_RING_LOGO_URL}
+                  alt="Audiense"
+                  className="w-12 h-12 rounded-full object-cover"
+                />
                 <span className="text-xs" style={{ color: 'var(--copy-tertiary)' }}>Audiense</span>
               </div>
             </div>

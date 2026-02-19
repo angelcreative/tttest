@@ -133,7 +133,7 @@ export function NetworkSelect({ onBack, onNext, onContinueToCreatorSearch }: Net
         </TitanButton>
       </div>
       <div className="flex-1 px-6 py-6 min-w-0" style={{ background: 'var(--surface-page)' }}>
-        <div className="w-full max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="w-full max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
           {networks.map((network) => (
             <NetworkCard
               key={network.id}
