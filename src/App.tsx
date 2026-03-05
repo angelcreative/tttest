@@ -105,7 +105,7 @@ function App() {
       {view === 'creator-discovery' && (
         <CreatorDiscoveryTable
           onNewReport={() => setView('select-network')}
-          onReportClick={(reportId) => { /* TODO: navigate to report detail */ }}
+          onReportClick={(_reportId) => { /* TODO: navigate to report detail */ }}
         />
       )}
       {view === 'select-network' && (
